@@ -1,0 +1,1 @@
+{"0": {"type": "3 unidirectional (close, return-spring on open)", "blockOption": "True", "nodeIdOpen": "ns=2;i=5", "nodeIdBlock": "ns=2;i=5", "nodeIdClose": "ns=2;i=6", "docName": "piston_shaft", "objLabel": "LCS_1", "vector": "z", "openPos": "100.0", "blockPos": "50.0", "closePos": "0.0", "openTime": "500.0", "closeTime": "500.0"}}
