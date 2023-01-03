@@ -1,0 +1,1 @@
+{"0": {"nodeID": "ns=2;i=2", "sign": "-", "multiplier": "1.0", "docName": "PlotterBeam", "obj_label": "LCS_Origin", "vector": "x"}, "1": {"nodeID": "ns=2;i=3", "sign": "+", "multiplier": "1.0", "docName": "PlotterSled", "obj_label": "LCS_1", "vector": "z"}, "2": {"nodeID": "ns=2;i=4", "sign": "+", "multiplier": "1.0", "docName": "PlotterA", "obj_label": "LCS_1", "vector": "deg"}}
