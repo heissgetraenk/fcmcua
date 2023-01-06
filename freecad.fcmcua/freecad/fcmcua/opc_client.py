@@ -1,6 +1,7 @@
 from asyncua.sync import Client, ua
 from opc_cad_updater import CadUpdater
 import time
+from datetime import datetime
 import FreeCADGui as Gui
 from fcmcua_actuator_logic import ActuatorLogic
 
@@ -74,6 +75,7 @@ class OpcClient():
         
         # main loop
         while self.running:
+            before = datetime.now()
             # get axis values from server
             for v in axes:
                 try:
@@ -95,7 +97,7 @@ class OpcClient():
             for a in range(len(self.actu_list)):
                 actu_values[a] = self.actu_objs[a].get_current_pos(actu_triggers[a])
 
-            print(actu_values)
+            # print(actu_values)
 
             # update and recompute the FreeCAD document if an axis value changed
             updated = False
@@ -124,6 +126,11 @@ class OpcClient():
             time.sleep(self.poll_rate/1000.0)
             # updateGui to prevent the loop from blocking the GUI
             Gui.updateGui()
+
+            after = datetime.now()
+            difference = after - before
+            time_elapsed = difference.total_seconds()
+            print('This Gui update took:', time_elapsed)
            
         # after connection was stopped
         client.disconnect()
