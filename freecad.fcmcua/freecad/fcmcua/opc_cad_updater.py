@@ -1,4 +1,5 @@
 import FreeCAD as App
+from datetime import datetime
 import math
 
 # round values received from FreeCAD to 3 decimals
@@ -18,6 +19,7 @@ class CadUpdater():
     def updateCAD(self):
         '''method to interact with FreeCAD model'''
 
+        print("update CAD")
         # loop counter as an index for the values-list 
         itr = 0
 
@@ -35,7 +37,12 @@ class CadUpdater():
             itr += 1
 
         #recompute the CAD model
+        before = datetime.now()
         App.ActiveDocument.recompute()
+        after = datetime.now()
+        difference = after - before
+        time_elapsed = difference.total_seconds()
+        print('This recompute took:', time_elapsed)
 
     def _getFcValues(self, doc, obj):
             try:    
