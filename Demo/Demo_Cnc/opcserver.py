@@ -1,6 +1,6 @@
 from asyncua import Server, ua
 from datetime import datetime
-import asyncio
+import asyncio, aioconsole
 
 #server address
 URL = "opc.tcp://127.0.0.1:4840"
@@ -138,7 +138,7 @@ async def main():
     #start the server
     async with server:
         while True:
-            cmd = input('Enter a command:')
+            cmd = await aioconsole.ainput('Enter a command:')
 
             if cmd == 'start':
                 await(close_doors(vars))

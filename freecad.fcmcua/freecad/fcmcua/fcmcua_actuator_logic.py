@@ -82,7 +82,7 @@ class ActuatorLogic:
     
     def _calculate_pos(self, state, pos): # state: opening, closing or holding
         # get attachment offset of FreeCad document
-        print("position before incr/decr/hold:", pos)
+        # print("position before incr/decr/hold:", pos)
         # check if actuator is in open or closed position
         is_almost_open = pos > (self.openPos - self.open_stw)
         is_fully_open = pos > self.openPos
