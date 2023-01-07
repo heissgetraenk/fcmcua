@@ -91,14 +91,14 @@ class FcmcuaPanel:
             self.actu_list.append(ActuatorWidgets(hidden=True))
 
         # initialize opc client object
-        self.opc = OpcClient(self.axis_list, self.actu_list, self.addrLEdit.text(), self.pollSpin.value())
+        self.opc = OpcClient(self.axis_list, self.actu_list)
 
         # load previous settings from file params.fcmc
         self.load()
 
     
     def onConnClicked(self):
-        self.opc.start()
+        self.opc.start(self.addrLEdit.text(), self.pollSpin.value())
 
 
     def onDisconnClicked(self):
@@ -107,6 +107,7 @@ class FcmcuaPanel:
        
     def accept(self):
         self.save()
+        self.opc.stop()
         FreeCADGui.Control.closeDialog() #close the dialog
 
     
