@@ -68,6 +68,18 @@ class OpcClient():
             # initialize the object for updating the FreeCAD document
             upd = CadUpdater(self.axis_list, axis_values, self.actu_list, actu_values)
 
+            # only connect if the active document contains a valid Assembly4 model
+            if upd.checkModel() is None:
+                # error message
+                print("No Assembly4 container found in active document")
+
+                # abort communication loop
+                self.running = False
+
+                # disconnect the client and return
+                client.disconnect()
+                return
+
             # initialize one actuator logic object per set of actuator configurations in actu_list
             # pass reference to the trigger variable-sets and to each actuator's parameters
             for o in range(len(self.actu_list)):
@@ -141,9 +153,6 @@ class OpcClient():
             sleep = (self.poll_rate/1000) - (t_end - t_start).total_seconds()
             if sleep > 0: 
                 time.sleep(sleep)
-                print("Slept for [s]: ", sleep)
-            print("calculated sleep time: ", sleep, "calculated from poll, time-diff: ", (self.poll_rate/1000), (t_end - t_start).total_seconds())
-
 
             # benchmarking
             after = datetime.now()

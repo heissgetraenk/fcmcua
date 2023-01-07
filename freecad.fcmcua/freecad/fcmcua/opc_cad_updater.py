@@ -42,7 +42,8 @@ class CadUpdater():
 
         #recompute the CAD model
         b_rec = datetime.now()
-        App.ActiveDocument.recompute()
+        # App.ActiveDocument.recompute()
+        self._recompute()
         
         # benchmarking
         a_rec = a_upd = datetime.now()
@@ -126,3 +127,49 @@ class CadUpdater():
         except:
             fc_values = [x, y, z, prev['old_angle']]
             print("Error while setting values in the freecad document", doc, fc_obj, fc_values)
+
+    def _recompute(self):
+        '''
+        If the active document contains an Assembly4 model, only recompute the model
+        else the whole document
+        '''
+        model = self.checkModel()
+
+        # _checkModel returns the Asm4 model container
+        # or None if there is no known container in the active document
+        if model is not None:
+            model.recompute(True)
+
+    def checkModel(self):
+        '''
+        checks and returns whether there is an Asm4 Assembly Model in the active document
+        '''
+
+        #
+        # This method is borrowed straight from Zolko's Asm4 workbench v0.12 (Asm4_libs.py).
+        # Thanks Zolko!
+        #
+
+        retval = None
+        if App.ActiveDocument:
+            model = App.ActiveDocument.getObject('Model')
+            # the current (as per v0.12) assembly container
+            if model and model.TypeId=='App::Part' \
+                    and model.Type == 'Assembly'   \
+                    and model.getParentGeoFeatureGroup() is None:
+                retval = model
+            else:
+                # former Assembly compatibility check:
+                assy = App.ActiveDocument.getObject('Assembly')
+                if assy and assy.TypeId=='App::Part'  \
+                        and assy.Type == 'Assembly'   \
+                        and assy.getParentGeoFeatureGroup() is None:
+                    retval = assy
+                else:
+                    # last chance, very old Asm4 Model
+                    if  model   and model.TypeId=='App::Part'  \
+                                and model.getParentGeoFeatureGroup() is None:
+                        retval = model
+        return retval
+
+
