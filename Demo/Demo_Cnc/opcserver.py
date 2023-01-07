@@ -40,7 +40,10 @@ async def g01(targets, feed, vars):
     # step widths
     s_widths = {}
     for axis in targets:
-        s_widths[axis] = (targets[axis] - prev_values[axis])/steps
+        if steps > 0:
+            s_widths[axis] = (targets[axis] - prev_values[axis])/steps
+        else:
+            s_widths[axis] = 0.0
 
     # loop, take a step each cycle
     # loop_time = 0.0
@@ -63,14 +66,14 @@ async def g01(targets, feed, vars):
         new_value = targets[axis]
         dv = ua.DataValue(ua.Variant(new_value, ua.VariantType.Double))
         await axis.write_value(dv)
-        await print_vars(vars)
+    await print_vars(vars)
 
     
-    after = datetime.now()
-    difference = after - before
-    time_elapsed = difference.total_seconds()
-    print("This g01 schould have taken ", t, "s")
-    print('This g01 took:', time_elapsed)
+    # after = datetime.now()
+    # difference = after - before
+    # time_elapsed = difference.total_seconds()
+    # print("This g01 schould have taken ", t, "s")
+    # print('This g01 took:', time_elapsed)
 
 
 
@@ -142,7 +145,11 @@ async def main():
 
             if cmd == 'start':
                 await(close_doors(vars))
-                await g01({vars['X']:1500, vars['Y']:800}, 1000, vars)
+                for i in range(5):
+                    await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:0, vars['B']:0}, 5000, vars)
+                    await g01({vars['X']:100, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
+                    await g01({vars['X']:100, vars['Y']:100, vars['Z']:200, vars['A']:0, vars['B']:0}, 5000, vars)
+                    await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
                 await(open_doors(vars))
 
             elif cmd == 'doors':

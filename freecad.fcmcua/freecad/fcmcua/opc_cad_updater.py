@@ -15,11 +15,15 @@ class CadUpdater():
         self.actu_list = actu_list
         self.actu_values = actu_values
 
+        # prepare benchmarking
+        self.cycles = 0
+        self.total_rec = self.total_upd = 0.0
+
 
     def updateCAD(self):
         '''method to interact with FreeCAD model'''
-
-        print("update CAD")
+        b_upd = datetime.now()
+        
         # loop counter as an index for the values-list 
         itr = 0
 
@@ -37,12 +41,22 @@ class CadUpdater():
             itr += 1
 
         #recompute the CAD model
-        before = datetime.now()
+        b_rec = datetime.now()
         App.ActiveDocument.recompute()
-        after = datetime.now()
-        difference = after - before
-        time_elapsed = difference.total_seconds()
-        print('This recompute took:', time_elapsed)
+        
+        # benchmarking
+        a_rec = a_upd = datetime.now()
+        rec_cyc = (a_rec - b_rec).total_seconds()
+        upd_cyc = (a_upd - b_upd).total_seconds()
+
+        self.total_rec += rec_cyc
+        self.total_upd += upd_cyc
+        self.cycles += 1
+        if self.cycles > 0:
+            avg_rec = self.total_rec / self.cycles
+            avg_upd = self.total_upd / self.cycles
+            print("Average recompute time [s]: ", avg_rec)
+            print("Average updateCAD time [s]: ", avg_upd)
 
     def _getFcValues(self, doc, obj):
             try:    
