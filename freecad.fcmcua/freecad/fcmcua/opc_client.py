@@ -1,8 +1,8 @@
-from asyncua.sync import Client, ua
+from asyncua.sync import Client
 from opc_cad_updater import CadUpdater
 import time
-from datetime import datetime
 import FreeCADGui as Gui
+from datetime import datetime
 from fcmcua_actuator_logic import ActuatorLogic
 
 class OpcClient():
@@ -36,13 +36,13 @@ class OpcClient():
             client.connect()
             root = client.get_root_node()
             #variables on the opc server:
-            axes = []
-            actuators = []
+            self.axes = []
+            self.actuators = []
 
             # gather axis variables
             for n in range(len(self.axis_list)):
                 # node = self.set_list[n].nodeID.text()
-                axes.append(client.get_node(self.axis_list[n].nodeID.text()))
+                self.axes.append(client.get_node(self.axis_list[n].nodeID.text()))
 
             # gather actuator variables in sets of three [open, close, block]
             for a in range(len(self.actu_list)):
@@ -53,23 +53,23 @@ class OpcClient():
                 # if the conditional block option is set, get also the node for that
                 block = client.get_node(self.actu_list[a].blockLEdit.text()) if (self.actu_list[a].blockCheck.isChecked()) else False
                 # per actuator, collect all nodes to be gotten from the opc server and place them in a list-entry
-                actuators.append([open, close, block])
+                self.actuators.append([open, close, block])
             
             # initialize lists for the axis values coming from the opc server
-            prev_axis_values = [0.0] * len(self.axis_list)
-            axis_values = [0.0] * len(self.axis_list)
+            self.prev_axis_values = [0.0] * len(self.axis_list)
+            self.axis_values = [0.0] * len(self.axis_list)
 
             # initialize lists for the actuator triggers coming from the opc server 
             # or the values from the actuator logic objects
-            actu_triggers = [[False] * (len(actuators[0])) for i in range(len(self.actu_list))]
-            actu_values = [False for i in range(len(self.actu_list))]
-            prev_actu_values = [False for i in range(len(self.actu_list))]
+            self.actu_triggers = [[False] * (len(self.actuators[0])) for i in range(len(self.actu_list))]
+            self.actu_values = [False for i in range(len(self.actu_list))]
+            self.prev_actu_values = [False for i in range(len(self.actu_list))]
 
             # initialize the object for updating the FreeCAD document
-            upd = CadUpdater(self.axis_list, axis_values, self.actu_list, actu_values)
+            self.upd = CadUpdater(self.axis_list, self.axis_values, self.actu_list, self.actu_values)
 
             # only connect if the active document contains a valid Assembly4 model
-            if upd.checkModel() is None:
+            if self.upd.checkModel() is None:
                 # error message
                 print("No Assembly4 container found in active document")
 
@@ -88,9 +88,16 @@ class OpcClient():
         except:
             print("Exception while connecting to opc server")
 
+
         # prepare benchmarking
         total_time = 0.0
         cycles = 0
+
+        self.do_upd = False
+        while not self.do_upd:
+            self._poll_opc()
+        
+        print("before main loop")
 
         # main loop
         while self.running:
@@ -98,53 +105,16 @@ class OpcClient():
 
             # measure how long the cycle takes before sleeping
             t_start = datetime.now()
-            # get axis values from server
-            for v in axes:
-                try:
-                    axis_values[axes.index(v)] = v.get_value()
-                except:
-                    pass
 
-            # get actuator trigger values from server
-            for set in actuators:
-                for id in set:
-                    try:
-                        actu_triggers[actuators.index(set)][set.index(id)] = id.get_value()
-                    except:
-                        # not a valid opc node
-                        pass
+            self.do_upd = False
 
+            # get values from opc server
+            self._poll_opc()
 
-            # get actuator target values as calculated by the actuator logic objects
-            for a in range(len(self.actu_list)):
-                actu_values[a] = self.actu_objs[a].get_current_pos(actu_triggers[a])
+            # update the assembly
+            self._updateCad()
 
-            # print(actu_values)
-
-            # update and recompute the FreeCAD document if an axis value changed
-            updated = False
-            for n in range(len(self.axis_list)):
-                if axis_values[n] != prev_axis_values[n]:
-                    upd.updateCAD()
-                    updated = True
-                    break
-
-            # update and recompute the FreeCAD document if an actuator value changed
-            # but only if updateCAD has not yet been called in this loop-cycle
-            if not updated:
-                for m in range(len(self.actu_list)):
-                    if actu_values[m] != prev_actu_values[m]:
-                        upd.updateCAD()
-                        break
-
-            # remember the values of the previous pass
-            for n in range(len(self.axis_list)):
-                prev_axis_values[n] = axis_values[n]
-
-            for m in range(len(self.actu_list)):
-                prev_actu_values[m] = actu_values[m]
-
-            # updateGui to prevent the loop from blocking the GUI
+            # update the Gui to prevent freeze
             Gui.updateGui()
     
             # wait for poll_rate (ms) --> calculate seconds by 1/1000.0
@@ -158,7 +128,7 @@ class OpcClient():
             after = datetime.now()
             time_elapsed = (after - before).total_seconds()
 
-            if updated:
+            if self.do_upd:
                 total_time += time_elapsed
                 cycles += 1
                 if cycles > 0:
@@ -171,4 +141,55 @@ class OpcClient():
 
     def stop(self):
         self.running = False
+
+    
+    def _poll_opc(self):
+        # get axis values from server
+        for v in self.axes:
+            try:
+                self.axis_values[self.axes.index(v)] = v.get_value()
+            except:
+                pass
+
+        # get actuator trigger values from server
+        for set in self.actuators:
+            for id in set:
+                try:
+                    self.actu_triggers[self.actuators.index(set)][set.index(id)] = id.get_value()
+                except:
+                    # not a valid opc node
+                    pass
+
+
+        # get actuator target values as calculated by the actuator logic objects
+        for a in range(len(self.actu_list)):
+            self.actu_values[a] = self.actu_objs[a].get_current_pos(self.actu_triggers[a])
+
+        # print(actu_values)
+
+        # update and recompute the FreeCAD document if an axis value changed
+        for n in range(len(self.axis_list)):
+            if self.axis_values[n] != self.prev_axis_values[n]:
+                self.do_upd = True
+                break
+
+        # update and recompute the FreeCAD document if an actuator value changed
+        # but only if updateCAD has not yet been called in this loop-cycle
+        if not self.do_upd:
+            for m in range(len(self.actu_list)):
+                if self.actu_values[m] != self.prev_actu_values[m]:
+                    self.do_upd = True
+                    break
+
+        # remember the values of the previous pass
+        for n in range(len(self.axis_list)):
+            self.prev_axis_values[n] = self.axis_values[n]
+
+        for m in range(len(self.actu_list)):
+            self.prev_actu_values[m] = self.actu_values[m]
+
+    
+    def _updateCad(self):
+        if self.do_upd: 
+            self.upd.updateCAD()
 
