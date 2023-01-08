@@ -95,9 +95,11 @@ class FcmcuaPanel:
 
         # load previous settings from file params.fcmc
         self.load()
+        print("fcmcua_cmd panel loaded")
 
     
     def onConnClicked(self):
+        print("connect clicked")
         self.opc.start(self.addrLEdit.text(), self.pollSpin.value())
 
 
