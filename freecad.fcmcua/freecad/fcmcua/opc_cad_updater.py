@@ -9,19 +9,19 @@ class CadUpdater():
     """
     Update the values of the given FreeCAD documents
     """
-    def __init__(self, axis_list, axis_values, actu_list, actu_values):
+    def __init__(self, axis_list, actu_list):
         self.axis_list = axis_list
-        self.axis_values = axis_values
         self.actu_list = actu_list
-        self.actu_values = actu_values
 
         # prepare benchmarking
         self.cycles = 0
         self.total_rec = self.total_upd = 0.0
 
 
-    def updateCAD(self):
+    def updateCAD(self, axis_values, actu_values):
         '''method to interact with FreeCAD model'''
+        self.axis_values = axis_values
+        self.actu_values = actu_values
         b_upd = datetime.now()
         
         # loop counter as an index for the values-list 
