@@ -123,7 +123,7 @@ class ActuatorPanel:
             for e in range(len(self.actu_list)):
                 try:
                     self.actu_list[e].typeCombo.setCurrentText(params[str(e)]['type'])
-                    self.actu_list[e].blockCheck.setChecked(bool(params[str(e)]['blockOption']))
+                    self.actu_list[e].blockCheck.setChecked(params[str(e)]['blockOption'] == True)
                     self.actu_list[e].openLEdit.setText(params[str(e)]['nodeIdOpen'])
                     self.actu_list[e].blockLEdit.setText(params[str(e)]['nodeIdBlock'])
                     self.actu_list[e].closeLEdit.setText(params[str(e)]['nodeIdClose'])
@@ -139,6 +139,7 @@ class ActuatorPanel:
                     break
         except:
             pass
+
 
     def accept(self):
         if self.actuators >0:

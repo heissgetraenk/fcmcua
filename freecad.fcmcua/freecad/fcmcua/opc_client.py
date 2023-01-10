@@ -13,8 +13,6 @@ class OpcClient():
         self.axis_list = axis_list
         # list of all actuator configurations
         self.actu_list = actu_list
-
-
         self.actu_objs = []
         
 
@@ -34,7 +32,8 @@ class OpcClient():
 
         try:
             client.connect()
-            root = client.get_root_node()
+            # root = client.get_root_node()
+
             #variables on the opc server:
             self.axes = []
             self.actuators = []
@@ -66,7 +65,7 @@ class OpcClient():
             self.prev_actu_values = [False for i in range(len(self.actu_list))]
 
             # initialize the object for updating the FreeCAD document
-            self.upd = CadUpdater(self.axis_list, self.axis_values, self.actu_list, self.actu_values)
+            self.upd = CadUpdater(self.axis_list, self.actu_list)
 
             # only connect if the active document contains a valid Assembly4 model
             if self.upd.checkModel() is None:
@@ -85,19 +84,17 @@ class OpcClient():
             for o in range(len(self.actu_list)):
                 # gather all actuator logic objects in a list
                 self.actu_objs.append(ActuatorLogic(self.actu_list[o], self.poll_rate))
-        except:
-            print("Exception while connecting to opc server")
+        except Exception as e: 
+            print(e)
+            raise e
 
 
         # prepare benchmarking
         total_time = 0.0
         cycles = 0
-
         self.do_upd = False
         while not self.do_upd:
             self._poll_opc()
-        
-        print("before main loop")
 
         # main loop
         while self.running:
@@ -191,5 +188,5 @@ class OpcClient():
     
     def _updateCad(self):
         if self.do_upd: 
-            self.upd.updateCAD()
+            self.upd.updateCAD(self.axis_values, self.actu_values)
 

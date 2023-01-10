@@ -112,6 +112,9 @@ class ActuatorWidgets(QtWidgets.QWidget):
         self.closeTSpin.setSuffix(__time_unit__)
         self.widgets.append(self.closeTSpin)
 
+        # call _onBlockChecked once
+        self._onBlockChecked()
+
     def _onClosePosChanged(self, value):
         '''
         closing position must be < opening position
@@ -161,7 +164,7 @@ class ActuatorWidgets(QtWidgets.QWidget):
 
     def _onBlockChecked(self):
         if not self.hidden:
-            print("option checkbox is checked:", self.blockCheck.isChecked())
+            # print("option checkbox is checked:", self.blockCheck.isChecked())
             if self.blockCheck.isChecked():
                 self.blockLabel.show()
                 self.blockSLabel.show()

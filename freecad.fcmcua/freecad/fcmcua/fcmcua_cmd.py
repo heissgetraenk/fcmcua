@@ -79,6 +79,13 @@ class FcmcuaPanel:
         # row 2, column 5, rowspan 1, colspan 5
         layout.addWidget(self.disconnBtn,2,5,1,5) 
 
+        # ---- row 3: server state indicator
+        self.stateLabel = QtWidgets.QLabel("Server: Disconnected")
+        self.stateLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+
+        # row 3, column 7, rowspan 1, colspan 3
+        layout.addWidget(self.stateLabel, 3, 7, 1, 3)
+
         # signal/slot connections connect/disconnect buttons
         self.connBtn.clicked.connect(self.onConnClicked)
         self.disconnBtn.clicked.connect(self.onDisconnClicked)
@@ -95,16 +102,23 @@ class FcmcuaPanel:
 
         # load previous settings from file params.fcmc
         self.load()
-        print("fcmcua_cmd panel loaded")
 
     
     def onConnClicked(self):
-        print("connect clicked")
-        self.opc.start(self.addrLEdit.text(), self.pollSpin.value())
+        try:
+            self.stateLabel.setText("Server: Connected")
+            self.opc.start(self.addrLEdit.text(), self.pollSpin.value())
+        except:
+            self.stateLabel.setText("Server: Error")
+
 
 
     def onDisconnClicked(self):
-        self.opc.stop()
+        try:
+            self.stateLabel.setText("Server: Disconnected")
+            self.opc.stop()
+        except:
+            self.stateLabel.setText("Server: Error")
 
        
     def accept(self):
@@ -224,7 +238,7 @@ class _LinkToOpcUa:
             'Connection settings dialog')
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             'FCMC_LinkToOpcUa',
-            'Set the server address and the path to the configuration files')
+            'Set the server address connect to the OPC UA Server')
         return {
             'Pixmap': os.path.join(ICONPATH, "fcmcua_wb.svg"),
             'MenuText': MenuText,

@@ -9,19 +9,19 @@ class CadUpdater():
     """
     Update the values of the given FreeCAD documents
     """
-    def __init__(self, axis_list, actu_list):
+    def __init__(self, axis_list, axis_values, actu_list, actu_values):
         self.axis_list = axis_list
+        self.axis_values = axis_values
         self.actu_list = actu_list
+        self.actu_values = actu_values
 
         # prepare benchmarking
         self.cycles = 0
         self.total_rec = self.total_upd = 0.0
 
 
-    def updateCAD(self, axis_values, actu_values):
+    def updateCAD(self):
         '''method to interact with FreeCAD model'''
-        self.axis_values = axis_values
-        self.actu_values = actu_values
         b_upd = datetime.now()
         
         # loop counter as an index for the values-list 
@@ -146,8 +146,7 @@ class CadUpdater():
         '''
 
         #
-        # This method is borrowed straight from Zolko's Asm4 workbench v0.12 (Asm4_libs.py).
-        # Thanks Zolko!
+        # This method is taken from Zolko's Asm4 workbench v0.12 (Asm4_libs.py).
         #
 
         retval = None
