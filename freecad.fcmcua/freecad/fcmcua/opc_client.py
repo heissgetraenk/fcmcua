@@ -13,8 +13,6 @@ class OpcClient():
         self.axis_list = axis_list
         # list of all actuator configurations
         self.actu_list = actu_list
-
-
         self.actu_objs = []
         
 
@@ -34,7 +32,9 @@ class OpcClient():
 
         try:
             client.connect()
-            #root = client.get_root_node()
+
+            # root = client.get_root_node()
+
             #variables on the opc server:
             self.axes = []
             self.actuators = []
@@ -85,14 +85,14 @@ class OpcClient():
             for o in range(len(self.actu_list)):
                 # gather all actuator logic objects in a list
                 self.actu_objs.append(ActuatorLogic(self.actu_list[o], self.poll_rate))
-        except:
-            print("Exception while connecting to opc server")
+        except Exception as e: 
+            print(e)
+            raise e
 
 
         # prepare benchmarking
         total_time = 0.0
         cycles = 0
-
         self.do_upd = False
         while not self.do_upd:
             self._poll_opc()

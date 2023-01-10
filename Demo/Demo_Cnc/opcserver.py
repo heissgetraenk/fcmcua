@@ -1,6 +1,8 @@
 from asyncua import Server, ua
 from datetime import datetime
 import asyncio, aioconsole
+import os
+import threading as th
 
 #server address
 URL = "opc.tcp://127.0.0.1:4840"
@@ -16,6 +18,7 @@ AXES = ['X', 'Y', 'Z', 'A', 'B']
 
 # update rate
 TICK = 0.005 #[s/step]
+
 
 async def g01(targets, feed, vars):
     '''
@@ -49,12 +52,11 @@ async def g01(targets, feed, vars):
     # loop_time = 0.0
     # cyc_start = datetime.now()
     for s in range(0,steps-1):
-        print("Step:", s)
         for axis in targets:
             new_value = prev_values[axis] + ((s+1) * s_widths[axis])
             dv = ua.DataValue(ua.Variant(new_value, ua.VariantType.Double))
             await axis.write_value(dv)
-        await print_vars(vars)
+        await _print_vars(vars)
         await asyncio.sleep(9*TICK/12)
 
     # cyc_end = datetime.now()
@@ -66,7 +68,7 @@ async def g01(targets, feed, vars):
         new_value = targets[axis]
         dv = ua.DataValue(ua.Variant(new_value, ua.VariantType.Double))
         await axis.write_value(dv)
-    await print_vars(vars)
+    await _print_vars(vars)
 
     
     # after = datetime.now()
@@ -79,30 +81,44 @@ async def g01(targets, feed, vars):
 
 async def toggle_doors(vars):
     print("Toggle doors")
-    await vars['Open'].write_value(True if (await vars['Open'].get_value() == False) else False)
-    await vars['Close'].write_value(True if (await vars['Close'].get_value() == False) else False)
-    await print_vars(vars)
+    do_open = await vars['Open'].get_value()
+    do_close = await vars['Close'].get_value()
+    # toggle doors open if both variables are True
+    if do_open and do_close:
+        do_close = False
+    # toggle doors closed if both variables are False
+    elif not do_open and not do_close:
+        do_close = True
+    # toggle both variables
+    else:
+        do_open = False if do_open else True
+        do_close = False if do_close else True
+
+    await vars['Open'].write_value(do_open)
+    await vars['Close'].write_value(do_close)
+    await _print_vars(vars)
 
 
 async def close_doors(vars):
     print("Close doors")
     await vars['Open'].write_value(False)
     await vars['Close'].write_value(True)
-    await print_vars(vars)
+    await _print_vars(vars)
 
 
 async def open_doors(vars):
     print("Open doors")
     await vars['Open'].write_value(True)
     await vars['Close'].write_value(False)
-    await print_vars(vars)
+    await _print_vars(vars)
 
 
-async def print_vars(vars):
+async def _print_vars(vars):
     result = ''
     for v in vars:
-        value = str(await vars[v].get_value())
+        value = str(round((await vars[v].get_value()), 1))
         result += (v + ': ' + value + ', ')
+    os.system('clear')
     print(result)
 
 async def main():
@@ -129,7 +145,7 @@ async def main():
         test_value += 10.0
 
     # door open/close signals
-    vars['Open'] = (await myNode.add_variable(idx, "Open", False))
+    vars['Open'] = (await myNode.add_variable(idx, "Open", True))
     vars['Close'] = (await myNode.add_variable(idx, "Close", False))
 
     # set all variables writable
@@ -141,11 +157,12 @@ async def main():
     #start the server
     async with server:
         while True:
+            os.system('clear')
             cmd = await aioconsole.ainput('Enter a command:')
 
             if cmd == 'start':
                 await(close_doors(vars))
-                for i in range(5):
+                for i in range(1):
                     await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:0, vars['B']:0}, 5000, vars)
                     await g01({vars['X']:100, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
                     await g01({vars['X']:100, vars['Y']:100, vars['Z']:200, vars['A']:0, vars['B']:0}, 5000, vars)
@@ -154,6 +171,17 @@ async def main():
 
             elif cmd == 'doors':
                 await toggle_doors(vars)
+            
+            elif cmd == 'stop':
+                do_open = await vars['Open'].get_value()
+                do_close = await vars['Close'].get_value()
+
+                if do_close:
+                    await vars['Open'].write_value(False)
+                    await vars['Close'].write_value(False)
+                elif do_open:
+                    await vars['Open'].write_value(True)
+                    await vars['Close'].write_value(True)
 
 
 if __name__ == "__main__":
