@@ -80,6 +80,11 @@ class FcmcuaPanel:
         layout.addWidget(self.disconnBtn,2,5,1,5) 
 
         # ---- row 3: server state indicator
+        self.compTimeLabel = QtWidgets.QLabel("Compute time: -- ms")
+
+        # row 3, column 0, rowspan 1, colspan 5
+        layout.addWidget(self.compTimeLabel, 3, 0, 1, 5)
+
         self.stateLabel = QtWidgets.QLabel("Server: Disconnected")
         self.stateLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 
@@ -107,18 +112,21 @@ class FcmcuaPanel:
     def onConnClicked(self):
         try:
             self.stateLabel.setText("Server: Connected")
-            self.opc.start(self.addrLEdit.text(), self.pollSpin.value())
+            self.opc.start(self.addrLEdit.text(), self.pollSpin.value(), self.compTimeLabel)
         except:
             self.stateLabel.setText("Server: Error")
+            self.compTimeLabel.setText("Compute time: -- ms")
 
 
 
     def onDisconnClicked(self):
         try:
             self.stateLabel.setText("Server: Disconnected")
+            self.compTimeLabel.setText("Compute time: -- ms")
             self.opc.stop()
         except:
             self.stateLabel.setText("Server: Error")
+            self.compTimeLabel.setText("Compute time: -- ms")
 
        
     def accept(self):
@@ -146,23 +154,6 @@ class FcmcuaPanel:
         except:
             pass
 
-        params.clear()
-
-        for e in range(len(self.axis_list)):
-            entry = {}
-            entry['nodeID'] = self.axis_list[e].nodeID.text()
-            entry['sign'] = self.axis_list[e].sign.currentText()
-            entry['multiplier'] = str(self.axis_list[e].multiSpin.value()).replace(',','.')
-            entry['docName'] = self.axis_list[e].docName.text()
-            entry['obj_label'] = self.axis_list[e].obj_label.text()
-            entry['vector'] = self.axis_list[e].vector.currentText()
-            params[str(e)] = entry
-        try:
-            with open(__axis_params__, 'w') as f:
-                f.write(json.dumps(params))
-        except:
-            pass
-
 
     def load(self):
         '''
@@ -184,6 +175,7 @@ class FcmcuaPanel:
                 self.axis_list[e].docName.setText(params[str(e)]['docName'])
                 self.axis_list[e].obj_label.setText(params[str(e)]['obj_label'])
                 self.axis_list[e].vector.setCurrentText(params[str(e)]['vector'])
+                self.axis_list[e].spd_pos.setCurrentText(params[str(e)]['spd_pos'])
             except:
                 break
             
