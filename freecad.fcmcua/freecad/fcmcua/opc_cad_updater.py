@@ -18,7 +18,7 @@ class CadUpdater():
         self.total_rec = self.total_upd = 0.0
 
 
-    def updateCAD(self, axis_values, actu_values):
+    def updateCAD(self, axis_values, actu_values, poll_rate):
         '''method to interact with FreeCAD model'''
         self.axis_values = axis_values
         self.actu_values = actu_values
@@ -29,7 +29,7 @@ class CadUpdater():
 
         # iterate through all axis settings entries
         for obj in self.axis_list:
-            self._updateAxis(obj, itr)
+            self._updateAxis(obj, itr, poll_rate)
             itr += 1
 
         # reset loop counter
@@ -79,28 +79,55 @@ class CadUpdater():
                     'rot_x':rot_x, 'rot_y':rot_y, 'rot_z':rot_z}
 
 
-    def _updateAxis(self, obj, itr):
+    def _updateAxis(self, obj, itr, poll_rate):
         # get values already in FreeCAD
         doc = obj.docName.text()
         fc_obj = obj.obj_label.text()
         prev = self._getFcValues(doc, fc_obj)
-                
-        try:    
-            #use previous values except for assigned opc variables (marked by n.vector.currentText() = 'x/y/z/°')
-            #factor in pos/neg sign where applicable
 
+                       
+        try:    
             #new placement vector values:
             multi = self.axis_list[itr].multiSpin.value()
-            val = multi * self.axis_values[itr]            
-            x = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'x' else prev['old_X']
-            y = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'y' else prev['old_Y']
-            z = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'z' else prev['old_Z']
+            # value from opc is positional in [mm]
+            if obj.spd_pos.currentText() == 'pos':
+                val = multi * self.axis_values[itr]
+            # value from opc is speed in [360°/min] or [1/min]
+            else:
+                # rotational speed axis/spindle
+                if obj.vector.currentText() == 'deg':
+                    # multiplier * speed [360°/s] * poll_rate [ms]
+                    val = multi * (6 * self.axis_values[itr]) * (poll_rate/1000)
+                # linear/positional speed axis
+                else:
+                    # multiplier is interpreted as gear ratio: e.g. 1 revolution = 10 mm --> multi = 10.0
+                    # multi [mm] * speed [1/min] * poll_rate [ms]
+                    val = multi * (self.axis_values[itr] / 60) * (poll_rate/1000)
 
-            #new angle
-            angle = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'deg' else prev['old_angle']
+            if obj.spd_pos.currentText() == 'pos':
+                # use previous values except for assigned opc variables (marked by n.vector.currentText() = 'x/y/z/°')
+                # factor in pos/neg sign where applicable
+                x = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'x' else prev['old_X']
+                y = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'y' else prev['old_Y']
+                z = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'z' else prev['old_Z']
 
-            #update the axis values in the freecad document
-            App.getDocument(doc).getObjectsByLabel(fc_obj)[0].AttachmentOffset = App.Placement(App.Vector(x,y,z),App.Rotation(App.Vector(prev['rot_x'], prev['rot_y'], prev['rot_z']), angle))
+                #n ew angle
+                angle = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'deg' else prev['old_angle']
+
+                # update the axis values in the freecad document
+                App.getDocument(doc).getObjectsByLabel(fc_obj)[0].AttachmentOffset = App.Placement(App.Vector(x,y,z),App.Rotation(App.Vector(prev['rot_x'], prev['rot_y'], prev['rot_z']), angle))
+            else:
+                # use previous values except for assigned opc variables (marked by n.vector.currentText() = 'x/y/z/°')
+                # increment those by the new value. factor in pos/neg sign where applicable
+                x = (prev['old_X'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'x' else prev['old_X']
+                y = (prev['old_Y'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'y' else prev['old_Y']
+                z = (prev['old_Z'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'z' else prev['old_Z']
+
+                # new angle
+                angle = (prev['old_angle'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'deg' else prev['old_angle']
+
+                # update the axis values in the freecad document
+                App.getDocument(doc).getObjectsByLabel(fc_obj)[0].AttachmentOffset = App.Placement(App.Vector(x,y,z),App.Rotation(App.Vector(prev['rot_x'], prev['rot_y'], prev['rot_z']), angle))
 
         except:
             fc_values = [x, y, z, angle]

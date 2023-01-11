@@ -29,15 +29,27 @@ class AxisPanel:
         layout = QtWidgets.QGridLayout(self.form)
 
         # ---- row 0: settings column headers
-        # Label:
-        self.opcLabel = QtWidgets.QLabel("OPC UA")
-        # Label:
-        self.fcLabel = QtWidgets.QLabel("FreeCAD")
+        # OPC UA side:
+        self.opcLabel = QtWidgets.QLabel("Node Id")
+        # FreeCad side:
+        self.multiLabel = QtWidgets.QLabel("Factor")
+        self.docLabel = QtWidgets.QLabel("Document")
+        self.objLabel = QtWidgets.QLabel("LCS")
+        self.vectorLabel = QtWidgets.QLabel("Offset")
+        self.typeLabel = QtWidgets.QLabel("Type")
 
-        # row 2, column 0, rowspan 1, colspan 3
+        # row 0, column 0, rowspan 1, colspan 3
         layout.addWidget(self.opcLabel,0,0,1,3)
-        # row 2, column 3, rowspan 1, colspan 2
-        layout.addWidget(self.fcLabel,0,3,1,2) 
+        # row 0, column 4, rowspan 1, colspan 1
+        layout.addWidget(self.multiLabel,0,4,1,1)
+        # row 0, column 5, rowspan 1, colspan 2
+        layout.addWidget(self.docLabel,0,5,1,2)
+        # row 0, column 7, rowspan 1, colspan 2
+        layout.addWidget(self.objLabel,0,7,1,2)
+        # row 0, column 9, rowspan 1, colspan 2
+        layout.addWidget(self.vectorLabel,0,9,1,1)
+        # row 0, column 5, rowspan 1, colspan 2
+        layout.addWidget(self.typeLabel,0,10,1,1)
 
         # ---- row 1..n: settings widgets
         for i in range(self.axes):
@@ -46,7 +58,7 @@ class AxisPanel:
             # starting column index
             col = 0 
             # list of column widths 
-            col_spans = [2,1,1,1,2,2,2] 
+            col_spans = [2,1,1,1,2,2,1,1] 
             # add widgets to layout with their respective column width, increment the column index accordingly
             for w in range(len(self.axis_list[0].widgets)):
                 layout.addWidget(self.axis_list[i].widgets[w],1+i,col,1,col_spans[w])
@@ -71,6 +83,7 @@ class AxisPanel:
             entry['docName'] = self.axis_list[e].docName.text()
             entry['obj_label'] = self.axis_list[e].obj_label.text()
             entry['vector'] = self.axis_list[e].vector.currentText()
+            entry['spd_pos'] = self.axis_list[e].spd_pos.currentText()
             params[str(e)] = entry
         try:
             with open(__axis_params__, 'w') as f:
@@ -98,6 +111,7 @@ class AxisPanel:
                     self.axis_list[e].docName.setText(params[str(e)]['docName'])
                     self.axis_list[e].obj_label.setText(params[str(e)]['obj_label'])
                     self.axis_list[e].vector.setCurrentText(params[str(e)]['vector'])
+                    self.axis_list[e].spd_pos.setCurrentText(params[str(e)]['spd_pos'])
                 except:
                     break
         except:

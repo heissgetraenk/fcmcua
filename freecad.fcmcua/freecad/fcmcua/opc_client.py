@@ -16,7 +16,7 @@ class OpcClient():
         self.actu_objs = []
         
 
-    def start(self, address, poll_rate):
+    def start(self, address, poll_rate, compT_widget):
         '''
         set-up and run a client-server connection to an opc ua server
         '''
@@ -131,6 +131,7 @@ class OpcClient():
                 cycles += 1
                 if cycles > 0:
                     avg = total_time / cycles
+                    compT_widget.setText(f"Compute time: {round(avg*1000, 1)} ms")
                     print("Average Opc Cycle time [s]: ", avg)
            
         # after connection was stopped
@@ -169,9 +170,12 @@ class OpcClient():
             # print(a)
             self.actu_values[a] = self.actu_objs[a].get_current_pos(self.actu_triggers[a])
 
-        # update and recompute the FreeCAD document if an axis value changed
+        # update and recompute the FreeCAD document
         for n in range(len(self.axis_list)):
-            if self.axis_values[n] != self.prev_axis_values[n]:
+            value_changed = (self.axis_values[n] != self.prev_axis_values[n])
+            speed_gr_zero = ((self.axis_list[n].spd_pos.currentText() == 'speed') and self.axis_values[n] > 0.0)
+            # do update if a value changed or a speed axis/spindle has > 0
+            if value_changed or speed_gr_zero:
                 self.do_upd = True
                 break
 
@@ -202,5 +206,5 @@ class OpcClient():
     
     def _updateCad(self):
         if self.do_upd: 
-            self.upd.updateCAD(self.axis_values, self.actu_values)
+            self.upd.updateCAD(self.axis_values, self.actu_values, self.poll_rate)
 

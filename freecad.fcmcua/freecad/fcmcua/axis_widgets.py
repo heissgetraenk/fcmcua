@@ -41,3 +41,7 @@ class AxisWidgets(QtWidgets.QWidget):
         self.vector = QtWidgets.QComboBox()
         self.vector.addItems(["x", "y", "z", "deg"])
         self.widgets.append(self.vector)
+        # speed/pos axis comboBox
+        self.spd_pos = QtWidgets.QComboBox()
+        self.spd_pos.addItems(["pos", "speed"])
+        self.widgets.append(self.spd_pos)

@@ -2,7 +2,6 @@ from asyncua import Server, ua
 from datetime import datetime
 import asyncio, aioconsole
 import os
-import threading as th
 
 #server address
 URL = "opc.tcp://127.0.0.1:4840"
@@ -163,10 +162,25 @@ async def main():
             if cmd == 'start':
                 await(close_doors(vars))
                 for i in range(1):
-                    await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:0, vars['B']:0}, 5000, vars)
-                    await g01({vars['X']:100, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
-                    await g01({vars['X']:100, vars['Y']:100, vars['Z']:200, vars['A']:0, vars['B']:0}, 5000, vars)
-                    await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
+                    await g01({vars['X']:200, vars['Y']:500, vars['Z']:300, vars['A']:0, vars['B']:45}, 20000, vars)
+                    await g01({vars['X']:300, vars['Y']:500, vars['Z']:200, vars['A']:0, vars['B']:45}, 10000, vars)
+                    await g01({vars['X']:200, vars['Y']:500, vars['Z']:300, vars['A']:0, vars['B']:45}, 20000, vars)
+                    await g01({vars['X']:200, vars['Y']:300, vars['Z']:300, vars['A']:-45, vars['B']:0}, 20000, vars)
+                    await g01({vars['X']:200, vars['Y']:300, vars['Z']:280, vars['A']:-45, vars['B']:0}, 20000, vars)
+                    await g01({vars['X']:600, vars['Y']:300, vars['Z']:280, vars['A']:-45, vars['B']:0}, 10000, vars)
+                    await g01({vars['X']:600, vars['Y']:300, vars['Z']:300, vars['A']:0, vars['B']:45}, 20000, vars)
+                    await g01({vars['X']:580, vars['Y']:300, vars['Z']:280, vars['A']:0, vars['B']:45}, 10000, vars)
+                    await g01({vars['X']:580, vars['Y']:700, vars['Z']:280, vars['A']:0, vars['B']:45}, 10000, vars)
+                    await g01({vars['X']:600, vars['Y']:700, vars['Z']:300, vars['A']:0, vars['B']:45}, 20000, vars)
+                    await g01({vars['X']:600, vars['Y']:700, vars['Z']:300, vars['A']:45, vars['B']:0}, 20000, vars)
+                    await g01({vars['X']:600, vars['Y']:680, vars['Z']:280, vars['A']:45, vars['B']:0}, 10000, vars)
+                    await g01({vars['X']:200, vars['Y']:680, vars['Z']:280, vars['A']:45, vars['B']:0}, 10000, vars)
+                    await g01({vars['X']:200, vars['Y']:700, vars['Z']:500, vars['A']:0, vars['B']:0}, 20000, vars)
+                    await g01({vars['X']:200, vars['Y']:100, vars['Z']:500, vars['A']:0, vars['B']:0}, 20000, vars)
+
+                    # await g01({vars['X']:100, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
+                    # await g01({vars['X']:100, vars['Y']:100, vars['Z']:200, vars['A']:0, vars['B']:0}, 5000, vars)
+                    # await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
                 await(open_doors(vars))
 
             elif cmd == 'doors':
