@@ -18,6 +18,9 @@ AXES = ['X', 'Y', 'Z', 'A', 'B']
 # update rate
 TICK = 0.005 #[s/step]
 
+# start values
+start_values = {'X': 200.0, 'Y': 100.0, 'Z': 500.0 ,'A': 0.0, 'B': 0.0}
+
 
 async def g01(targets, feed, vars):
     '''
@@ -136,12 +139,10 @@ async def main():
 
     # list of variables
     vars = {}
-    test_value = 100.0
 
     # axis values
     for axis in AXES:
-        vars[axis] = await myNode.add_variable(idx, axis, 0.0 + test_value)
-        test_value += 10.0
+        vars[axis] = await myNode.add_variable(idx, axis, start_values[axis])
 
     # door open/close signals
     vars['Open'] = (await myNode.add_variable(idx, "Open", True))
@@ -177,10 +178,6 @@ async def main():
                     await g01({vars['X']:200, vars['Y']:680, vars['Z']:280, vars['A']:45, vars['B']:0}, 10000, vars)
                     await g01({vars['X']:200, vars['Y']:700, vars['Z']:500, vars['A']:0, vars['B']:0}, 20000, vars)
                     await g01({vars['X']:200, vars['Y']:100, vars['Z']:500, vars['A']:0, vars['B']:0}, 20000, vars)
-
-                    # await g01({vars['X']:100, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
-                    # await g01({vars['X']:100, vars['Y']:100, vars['Z']:200, vars['A']:0, vars['B']:0}, 5000, vars)
-                    # await g01({vars['X']:500, vars['Y']:500, vars['Z']:500, vars['A']:180, vars['B']:180}, 5000, vars)
                 await(open_doors(vars))
 
             elif cmd == 'doors':
