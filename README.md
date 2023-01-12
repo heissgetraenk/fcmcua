@@ -22,15 +22,14 @@ This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 
 #### Linux:  
 
-1. When using a FreeCAD AppImage: make sure you have the same python version installed, as is packaged into the AppImage
-2. Install dependencies: 
-    1. asyncua
-    2. pyside2
-    `pip install asyncua`
+1. When using a FreeCAD AppImage: make sure you have the same python version installed, as packaged into the AppImage
+2. Install dependencies into the correct python version: 
+    1. `pip install asyncua`
+    2. `pip install pyside2`    
 3. Place the files from [freecad.fcmcua/freecad/fcmcua](https://github.com/heissgetraenk/fcmcua/tree/main/freecad.fcmcua/freecad/fcmcua) in your FreeCAD/Mod directory:
-    1. package install: *~/.FreeCAD/Mod*
-    2. AppImage: *~/.local/share/FreeCAD/Mod*
-    3. Make sure to use this directory structure: *~/.FreeCAD/Mod/freecad.fcmcua/freecad/fcmcua*
+    * package install: *~/.FreeCAD/Mod*
+    * AppImage: *~/.local/share/FreeCAD/Mod*
+    * Make sure to use this directory structure: *~/.FreeCAD/Mod/freecad.fcmcua/freecad/fcmcua*
 4. Edit the paths in **fcmcua.ini**:
     1. **PyPath**: Path to your python packages
     2. **WbPath**: Path to where you placed the workbench files
@@ -46,7 +45,7 @@ This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 ```
 As you can see, the FreeCAD part that contains the LCS is given a Placement object. The LCS whose AttachmentOffset is updated is identified by the name of the Part's document and the Label you have given the LCS.  
 
-Note also, that the Placement object given to the LCS contains a position and a rotation. The Fcmcua workbench gets values from an OPC UA node and plugs them into the x, y, z or angle of the Placement object. To know where each value goes, you need to configure each node - Placement pairing.  
+Note also, that the Placement object given to the LCS contains a position and a rotation. The Fcmcua workbench gets values from an OPC UA node and plugs them into the x, y, z or angle of the Placement object. For Fcmcua to know where each value goes, you need to configure each Node - Placement pairing.  
 
 ### Configuring Axis Settings:  
 
@@ -59,7 +58,7 @@ To set the number of axis nodes you want to configure, edit the **fcmcua.ini** f
 * **Factor:**         This gets multiplied with the value comming from the node. If for example you control a motor by outputting a speed or rotor-position, you might not have a variable in your controller that represents the actual position of that axis. In that case you might want to factor in a gear ratio to derive the position from the value that you do have in the controller.  
 * **Document Name:**  The name of the file containing the Local Coordinate System.  
 * **LCS:**            The label you have given the Local Coordinate System (LCS)  
-* **Offset:**         The vector component of the AttachmentOffset that will receive the value coming from the OPC node. The selected x, y, z or angle correspond to the the vector components in the App.Placement command shown above.  
+* **Offset:**         The part of the AttachmentOffset that the value from the OPC node will be plugged into. The selected x, y, z or angle correspond to the the vector components in the App.Placement command shown above.  
 * **Type:**           What kind of value does the OPC node represent: An axis **pos**ition or a motor **speed**?  
 
 ### Configuring Actuator Settings:  
@@ -80,11 +79,15 @@ Think of actuators as anything that performs a motion and is started/stopped by 
 (**Add a screenshot here**)  
 
 * **URL:**          Server address in the format opc.tcp://*ip-address*:4840
-* **Polling rate:** Time between polls of the OPC values. How low this can be set is limited by the time it takes to recompute the FreeCAD model after each update. The polling rate also serves to give the actuator logic a reference for how wide to make the steps for each tick. Try to match the compute time for accuracy in that regard.
+* **Polling rate:** Time between polls of the OPC values. How low this can be set to is limited by the time it takes to recompute the FreeCAD model after each update. The polling rate also serves to give the actuator logic a reference for how wide to make the steps for each tick. Try to match the polling rate to the compute time for accuracy in that regard.
 
 ## A word on Performance
 
-Fcmcua performs a recompute of the assembly model after each update. How fast it manages to do so is mainly dependent on the complexity of your parts and size of your overall model. It is therefore recommended to  build a very rough mockup of the kinematics of the physical machine you intend to program. A faithful CAD rendition of your machine will very likely take too long to recompute to make for a useable animation. The system I tested it on (Ryzen 7 3700X, RTX2070, 16GB RAM at 3200MHz) managed about 10-13 updates per second, depending on what else the system was doing at the time. Your mileage may vary. If you have thoughts on how to optimize the recompute performance, please let me know.
+Fcmcua performs a recompute of the assembly model after each update. How fast it manages to do so is mainly dependent on the complexity of your parts and size of your overall model. It is therefore recommended to  build a very rough mockup of the kinematics of the physical machine you intend to program. A faithful CAD rendition of your machine will very likely take too long to recompute to make for a useable animation.  
+
+The system I tested it on (Ryzen 7 3700X, RTX2070, 16GB RAM at 3200MHz) managed about 10-13 updates per second, depending on what else the system was doing at the time. Your mileage may vary.  
+
+If you have thoughts on how to optimize the recompute performance, please let me know.
 
 ## ToDo  
 
