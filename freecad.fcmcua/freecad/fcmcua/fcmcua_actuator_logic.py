@@ -2,7 +2,7 @@ import FreeCAD as App
 import math
 
 # round values received from FreeCAD to 3 decimals
-_RND_PARAM = 3
+RND_PARAM = 3
 
 class ActuatorLogic:
     def __init__(self, params, pollRate):
@@ -33,15 +33,16 @@ class ActuatorLogic:
         self.close_stw = (self.stroke_l * self.pollRate)/self.closeTime
 
     
-    def get_current_pos(self, triggers):
+    def get_current_pos(self, triggers, blockOption):
         '''
         calculate new actuator position 
         '''
         open = triggers[0]
         close = triggers[1]
         block = triggers[2]
+        self.blockOptionSet = blockOption
 
-        # get the actual postion for this actuator from FreeCAD
+        # get the current postion for this actuator from FreeCAD
         pos = self._get_fc_pos()[self.vector]        
 
         # get opening or closing state depending on type of actuator
@@ -63,16 +64,16 @@ class ActuatorLogic:
         '''
         try:    
             # get actual placement from the document
-            old_X = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Base.x, _RND_PARAM)
-            old_Y = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Base.y, _RND_PARAM)
-            old_Z = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Base.z, _RND_PARAM)
+            old_X = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Base.x, RND_PARAM)
+            old_Y = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Base.y, RND_PARAM)
+            old_Z = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Base.z, RND_PARAM)
 
             # get actual rotation from the document
             rad_angle = App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Angle
-            old_angle = round(rad_angle * 180 / math.pi, _RND_PARAM)
-            rot_x = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Axis.x, _RND_PARAM)
-            rot_y = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Axis.y, _RND_PARAM)
-            rot_z = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Axis.z, _RND_PARAM)
+            old_angle = round(rad_angle * 180 / math.pi, RND_PARAM)
+            rot_x = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Axis.x, RND_PARAM)
+            rot_y = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Axis.y, RND_PARAM)
+            rot_z = round(App.getDocument(self.doc).getObjectsByLabel(self.fc_obj)[0].AttachmentOffset.Rotation.Axis.z, RND_PARAM)
         except:
             print("Error while getting values from the freecad document", self.doc, self.fc_obj)
 
