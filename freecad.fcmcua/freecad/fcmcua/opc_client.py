@@ -167,8 +167,8 @@ class OpcClient():
 
         # get actuator target values as calculated by the actuator logic objects
         for a in range(len(self.actu_list)):
-            # print(a)
-            self.actu_values[a] = self.actu_objs[a].get_current_pos(self.actu_triggers[a])
+            blockOption = self.actu_list[a].blockCheck.isChecked()
+            self.actu_values[a] = self.actu_objs[a].get_current_pos(self.actu_triggers[a], blockOption)
 
         # update and recompute the FreeCAD document
         for n in range(len(self.axis_list)):
@@ -197,7 +197,11 @@ class OpcClient():
 
     
     def _get_value(self, node):
-        return node.get_value()
+        try:
+            return node.get_value()
+        except:
+            # not a valid node id
+            return False
 
 
     def _get_act_values(self, set):

@@ -113,9 +113,10 @@ class FcmcuaPanel:
         try:
             self.stateLabel.setText("Server: Connected")
             self.opc.start(self.addrLEdit.text(), self.pollSpin.value(), self.compTimeLabel)
-        except:
+        except Exception as e:
             self.stateLabel.setText("Server: Error")
             self.compTimeLabel.setText("Compute time: -- ms")
+            print("[Fcmcua] ", e)
 
 
 
@@ -124,9 +125,10 @@ class FcmcuaPanel:
             self.stateLabel.setText("Server: Disconnected")
             self.compTimeLabel.setText("Compute time: -- ms")
             self.opc.stop()
-        except:
+        except Exception as e:
             self.stateLabel.setText("Server: Error")
             self.compTimeLabel.setText("Compute time: -- ms")
+            print("[Fcmcua] ", e)
 
        
     def accept(self):
@@ -189,7 +191,7 @@ class FcmcuaPanel:
         for e in range(len(self.actu_list)):
             try:
                 self.actu_list[e].typeCombo.setCurrentText(params[str(e)]['type'])
-                self.actu_list[e].blockCheck.setChecked(bool(params[str(e)]['blockOption']))
+                self.actu_list[e].blockCheck.setChecked(params[str(e)]['blockOption'] == 'True')
                 self.actu_list[e].openLEdit.setText(params[str(e)]['nodeIdOpen'])
                 self.actu_list[e].blockLEdit.setText(params[str(e)]['nodeIdBlock'])
                 self.actu_list[e].closeLEdit.setText(params[str(e)]['nodeIdClose'])
