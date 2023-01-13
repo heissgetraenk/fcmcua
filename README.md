@@ -4,11 +4,11 @@ Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can 
 ## Use cases:
 
 - **Virtual Commissioning**  
-  Visualize PLC motion control code on a mock-up of your target machine before testing it on the real hardware. This is especially useful if the machine is not yet built or even fully designed.
-  Many modern PLCs posses OPC UA servers, that can be activated to read data from the controller. Configure the OPC UA server, connect your FreeCAD assembly to your PLC (or its digital twin) and take a look at what your PLC code is doing, even without access to a physical prototype of your target machine.
+  Visualize PLC motion control code on a mock-up of your target machine before testing it on the real hardware. This is especially useful if you want to program the PLC before the physical machine is fully built or even fully designed.
+  Many modern PLCs posses OPC UA servers that can be activated to read data from the controller. Configure the OPC UA server, connect your FreeCAD assembly to your PLC (or its digital twin/simulation) and take a look at what your PLC code is doing, even without access to a physical prototype of your target machine.
 
 - **Interactive animations**  
-  Write your own minimal OPC UA server with an embedded script for interaction with your Assembly4 Model. An example can be found [here](https://github.com/heissgetraenk/fcmcua/tree/main/Demo/Demo_Cnc).  
+  Write your own minimal OPC UA server with an embedded script for interaction with your Assembly4 Model. You can see an [example](https://github.com/heissgetraenk/fcmcua/tree/main/Demo/Demo_Cnc) OPC server in action in the GIF below.  
 
 ![fcmcua_demo](https://user-images.githubusercontent.com/104628764/211853683-031cf2f3-6bcc-41fa-9d38-f4cbf12fcaa7.gif)  
 
