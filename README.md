@@ -1,5 +1,5 @@
 # FreeCAD Motion Control Workbench FCMCUA
-Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can be used to manipulate assemblies created by the [Assembly4](https://github.com/Zolko-123/FreeCAD_Assembly4) workbench. It does so by updating the Attachment Offsets of the Local Coordinate Systems to match the target position values provided by the OPC UA server.
+Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can be used to manipulate assemblies created by the [Assembly4](https://github.com/Zolko-123/FreeCAD_Assembly4) workbench. It does so by updating the Attachment Offsets of the model's Local Coordinate Systems to match the target position values provided by the OPC UA server.
 
 ## Use cases:
 
