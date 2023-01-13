@@ -51,7 +51,7 @@ Note also, that the Placement object given to the LCS contains a position and a 
 
 To set the number of axis nodes you want to configure, edit the **fcmcua.ini** file in the Fcmcua install directory.
 
-(**Add a screenshot here**)  
+ ![axis_settings](https://user-images.githubusercontent.com/104628764/212299899-c6022ade-881f-4acd-a94e-dfa800b48d07.png)
 
 * **Node Id:**        Node Id on the OPC UA server. Fcmcua expects a string that looks like this: *ns=2;i=2*  
 * **Sign:**           The value coming from the OPC node might be oriented opposite to the direction in which you assembled the model. Invert the value by selecting +/-.  
@@ -65,7 +65,8 @@ To set the number of axis nodes you want to configure, edit the **fcmcua.ini** f
 
 Think of actuators as anything that performs a motion and is started/stopped by binary signals. To set the number of actuator nodes you want to configure, edit the **fcmcua.ini** file in the Fcmcua install directory.
 
-(**Add a screenshot and a gif of the DemoMill doors here**)  
+![actuator_settings](https://user-images.githubusercontent.com/104628764/212299969-1e048288-ebc0-4795-88fe-0ba7e67ab762.png) 
+![Doorsdemo](https://user-images.githubusercontent.com/104628764/212299978-eeaaea8d-1558-4cc1-a440-5fa7c09a5190.gif)
 
 * **Type:**                      Is the actuator opened and closed by separate signals or is it actuated in one direction and returns automatically when the actuating signal is *False*?  
 * **Conditional Block:**         The actuator may be stopped somewhere along its path by another signal (e.g. a sensor detecting a piston position and stopping the piston, or a mechanical block interjecting the pistons travel).  
@@ -76,7 +77,7 @@ Think of actuators as anything that performs a motion and is started/stopped by 
 
 ### Connecting to the OPC UA server  
 
-(**Add a screenshot here**)  
+![connect_panel](https://user-images.githubusercontent.com/104628764/212300030-0c74597d-ebbb-4205-8562-0e1779ae42e7.png)
 
 * **URL:**          Server address in the format opc.tcp://*ip-address*:4840
 * **Polling rate:** Time between polls of the OPC values. How low this can be set to is limited by the time it takes to recompute the FreeCAD model after each update. The polling rate also serves to give the actuator logic a reference for how wide to make the steps for each tick. Try to match the polling rate to the compute time for accuracy in that regard.
