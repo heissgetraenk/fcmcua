@@ -86,7 +86,6 @@ class OpcClient():
                 # gather all actuator logic objects in a list
                 self.actu_objs.append(ActuatorLogic(self.actu_list[o], self.poll_rate))
         except Exception as e: 
-            print(e)
             raise e
 
 
@@ -132,7 +131,7 @@ class OpcClient():
                 if cycles > 0:
                     avg = total_time / cycles
                     compT_widget.setText(f"Compute time: {round(avg*1000, 1)} ms")
-                    print("Average Opc Cycle time [s]: ", avg)
+                    # print("Average Opc Cycle time [s]: ", avg)
            
         # after connection was stopped
         client.disconnect()

@@ -22,7 +22,7 @@ class CadUpdater():
         '''method to interact with FreeCAD model'''
         self.axis_values = axis_values
         self.actu_values = actu_values
-        b_upd = datetime.now()
+        # b_upd = datetime.now()
         
         # loop counter as an index for the values-list 
         itr = 0
@@ -41,23 +41,23 @@ class CadUpdater():
             itr += 1
 
         #recompute the CAD model
-        b_rec = datetime.now()
+        # b_rec = datetime.now()
         # App.ActiveDocument.recompute()
         self._recompute()
         
         # benchmarking
-        a_rec = a_upd = datetime.now()
-        rec_cyc = (a_rec - b_rec).total_seconds()
-        upd_cyc = (a_upd - b_upd).total_seconds()
+        # a_rec = a_upd = datetime.now()
+        # rec_cyc = (a_rec - b_rec).total_seconds()
+        # upd_cyc = (a_upd - b_upd).total_seconds()
 
-        self.total_rec += rec_cyc
-        self.total_upd += upd_cyc
-        self.cycles += 1
-        if self.cycles > 0:
-            avg_rec = self.total_rec / self.cycles
-            avg_upd = self.total_upd / self.cycles
-            print("Average recompute time [s]: ", avg_rec)
-            print("Average updateCAD time [s]: ", avg_upd)
+        # self.total_rec += rec_cyc
+        # self.total_upd += upd_cyc
+        # self.cycles += 1
+        # if self.cycles > 0:
+        #     avg_rec = self.total_rec / self.cycles
+        #     avg_upd = self.total_upd / self.cycles
+            # print("Average recompute time [s]: ", avg_rec)
+            # print("Average updateCAD time [s]: ", avg_upd)
 
     def _getFcValues(self, doc, obj):
             try:    
@@ -72,8 +72,8 @@ class CadUpdater():
                 rot_x = round(App.getDocument(doc).getObjectsByLabel(obj)[0].AttachmentOffset.Rotation.Axis.x, _RND_PARAM)
                 rot_y = round(App.getDocument(doc).getObjectsByLabel(obj)[0].AttachmentOffset.Rotation.Axis.y, _RND_PARAM)
                 rot_z = round(App.getDocument(doc).getObjectsByLabel(obj)[0].AttachmentOffset.Rotation.Axis.z, _RND_PARAM)
-            except:
-                print("Error while getting values from the freecad document", doc, obj)
+            except Exception as e:
+                print("[Fcmcua] Error while getting values from the freecad document", e)
 
             return {'old_X':old_X, 'old_Y':old_Y, 'old_Z':old_Z, 'old_angle':old_angle,
                     'rot_x':rot_x, 'rot_y':rot_y, 'rot_z':rot_z}
@@ -129,9 +129,8 @@ class CadUpdater():
                 # update the axis values in the freecad document
                 App.getDocument(doc).getObjectsByLabel(fc_obj)[0].AttachmentOffset = App.Placement(App.Vector(x,y,z),App.Rotation(App.Vector(prev['rot_x'], prev['rot_y'], prev['rot_z']), angle))
 
-        except:
-            fc_values = [x, y, z, angle]
-            print("Error while setting values in the freecad document", doc, fc_obj, fc_values)
+        except Exception as e:
+            print("[Fcmcua] Error while setting values in the freecad document", e)
 
    
     def _updateActuator(self, obj, itr):
@@ -151,9 +150,8 @@ class CadUpdater():
             #update the actuator values in the freecad document
             App.getDocument(doc).getObjectsByLabel(fc_obj)[0].AttachmentOffset = App.Placement(App.Vector(x,y,z),App.Rotation(App.Vector(prev['rot_x'], prev['rot_y'], prev['rot_z']), prev['old_angle']))
 
-        except:
-            fc_values = [x, y, z, prev['old_angle']]
-            print("Error while setting values in the freecad document", doc, fc_obj, fc_values)
+        except Exception as e:
+            print("[Fcmcua] Error while setting values in the freecad document", e)
 
     def _recompute(self):
         '''
