@@ -88,12 +88,10 @@ If you have thoughts on how to optimize the recompute performance, please let me
 This workbench is very much a work in progress. Any advice is welcome, as are contributions to the code. The following points could be improved upon in the future:  
 
 * comments and code clean up (I'll get to it someday, I swear!)
-* exception handling and handling of inputs: make sure something userfriendly happens when things go wrong
 * automate the installation process  
 * change the number of axis/actuators from the Gui  
 * accept Node Ids in the form of *ns=2;VariableName*  
-* implement a switch metric/imperial or read it from the FreeCAD preferences  
-* add +/- option to the actuator config  
+* implement a switch metric/imperial or read it from the FreeCAD preferences    
 * add accelaration to the actuator logic (constant speed at the moment)  
 * add button to show/hide whole actuator configuration widget --> might get crowded in models with many actuators  
 
