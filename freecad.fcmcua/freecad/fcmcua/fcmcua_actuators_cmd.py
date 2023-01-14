@@ -5,10 +5,9 @@ import os
 import json
 
 from actuator_widgets import ActuatorWidgets
+from fcmcua_settings import Settings
 from freecad.fcmcua import ICONPATH, ACTUATORS
 
-__dir__ = os.path.dirname(__file__)
-__actuator_params__ = os.path.join(__dir__, 'actuator_params.fcmc')
 
 class ActuatorPanel:
     
@@ -18,6 +17,9 @@ class ActuatorPanel:
 
         #attribute for storing all actuator widgets
         self.actu_list = []
+
+        # instance of Settings
+        self.settings = Settings()
 
         #reference to QWidget
         self.form = widget
@@ -72,78 +74,16 @@ class ActuatorPanel:
                 main_layout.addWidget(groups[i])
 
             # load actuator parameters from file
-            self.load()
+            self.settings.load_actuator_settings(self.actu_list)
 
         else:
             defaultLabel = QtWidgets.QLabel('No actuator available')
             main_layout.addWidget(defaultLabel)
 
-    def save(self):
-        '''
-        save actuator parameters to file
-        '''
-        params = {}
-
-        for e in range(len(self.actu_list)):
-            entry = {}
-
-            # add all widget values to entry dict
-            entry['type'] = self.actu_list[e].typeCombo.currentText()
-            entry['blockOption'] = str(self.actu_list[e].blockCheck.isChecked())
-            entry['nodeIdOpen'] = self.actu_list[e].openLEdit.text()
-            entry['nodeIdBlock'] = self.actu_list[e].blockLEdit.text()
-            entry['nodeIdClose'] = self.actu_list[e].closeLEdit.text()
-            entry['docName'] = self.actu_list[e].docLEdit.text()
-            entry['objLabel'] = self.actu_list[e].objLEdit.text()
-            entry['vector'] = self.actu_list[e].vectorCombo.currentText()
-            entry['openPos'] = str(self.actu_list[e].openSpin.value()).replace(',', '.' )
-            entry['blockPos'] = str(self.actu_list[e].blockSpin.value()).replace(',', '.' )
-            entry['closePos'] = str(self.actu_list[e].closeSpin.value()).replace(',', '.' )
-            entry['openTime'] = str(self.actu_list[e].openTSpin.value()).replace(',', '.' )
-            entry['closeTime'] = str(self.actu_list[e].closeTSpin.value()).replace(',', '.' )
-
-            # add entry dict to params dict with actuator-No. as key
-            params[str(e)] = entry
-        
-        try:
-            with open(__actuator_params__, 'w') as f:
-                f.write(json.dumps(params))
-        except:
-            pass
-
-
-    def load(self):
-        '''
-        load actuator parameters from file
-        '''
-        try:
-            with open(__actuator_params__, 'r') as f:
-                params = json.loads(f.read())
-
-            for e in range(len(self.actu_list)):
-                try:
-                    self.actu_list[e].typeCombo.setCurrentText(params[str(e)]['type'])
-                    self.actu_list[e].blockCheck.setChecked(params[str(e)]['blockOption'] == 'True')
-                    self.actu_list[e].openLEdit.setText(params[str(e)]['nodeIdOpen'])
-                    self.actu_list[e].blockLEdit.setText(params[str(e)]['nodeIdBlock'])
-                    self.actu_list[e].closeLEdit.setText(params[str(e)]['nodeIdClose'])
-                    self.actu_list[e].docLEdit.setText(params[str(e)]['docName'])
-                    self.actu_list[e].objLEdit.setText(params[str(e)]['objLabel'])
-                    self.actu_list[e].vectorCombo.setCurrentText(params[str(e)]['vector'])
-                    self.actu_list[e].openSpin.setValue(float(params[str(e)]['openPos'].replace(',', '.' )))
-                    self.actu_list[e].blockSpin.setValue(float(params[str(e)]['blockPos'].replace(',', '.' )))
-                    self.actu_list[e].closeSpin.setValue(float(params[str(e)]['closePos'].replace(',', '.' )))
-                    self.actu_list[e].openTSpin.setValue(float(params[str(e)]['openTime'].replace(',', '.' )))
-                    self.actu_list[e].closeTSpin.setValue(float(params[str(e)]['closeTime'].replace(',', '.' )))
-                except:
-                    break
-        except:
-            pass
-
 
     def accept(self):
-        if self.actuators >0:
-            self.save()
+        if self.actuators > 0:
+            self.settings.save_actuator_settings(self.actu_list)
         FreeCADGui.Control.closeDialog() #close the dialog
 
     

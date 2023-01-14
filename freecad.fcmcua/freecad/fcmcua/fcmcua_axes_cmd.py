@@ -5,6 +5,7 @@ import os
 import json
 
 from axis_widgets import AxisWidgets
+from fcmcua_settings import Settings
 from freecad.fcmcua import ICONPATH, AXES
 
 __dir__ = os.path.dirname(__file__)
@@ -18,6 +19,9 @@ class AxisPanel:
 
         #attribute for storing all settings widgets
         self.axis_list = []
+
+        # instance of Settings
+        self.settings = Settings()
 
         # some variables
         self.poll_rate = 50
@@ -65,60 +69,11 @@ class AxisPanel:
                 col += col_spans[w]
 
         #load previous settings from file params.fcmc
-        self.load()
-
-    def save(self):
-        '''
-        write axis parameters to file
-        '''
-        params = {}
-        # params['url'] = self.address
-        # params['poll'] = str(self.poll_rate)
-
-        for e in range(len(self.axis_list)):
-            entry = {}
-            entry['nodeID'] = self.axis_list[e].nodeID.text()
-            entry['sign'] = self.axis_list[e].sign.currentText()
-            entry['multiplier'] = str(self.axis_list[e].multiSpin.value()).replace(',','.')
-            entry['docName'] = self.axis_list[e].docName.text()
-            entry['obj_label'] = self.axis_list[e].obj_label.text()
-            entry['vector'] = self.axis_list[e].vector.currentText()
-            entry['spd_pos'] = self.axis_list[e].spd_pos.currentText()
-            params[str(e)] = entry
-        try:
-            with open(__axis_params__, 'w') as f:
-                f.write(json.dumps(params))
-        except:
-            pass
-
-
-    def load(self):
-        '''
-        load axis parameters from file
-        '''
-        try:
-            with open(__axis_params__, 'r') as f:
-                params = json.loads(f.read())
-
-            # self.address = params['url']
-            # self.poll_rate = float(params['poll'].replace(',', '.' ))
-
-            for e in range(len(self.axis_list)):
-                try:
-                    self.axis_list[e].nodeID.setText(params[str(e)]['nodeID'])
-                    self.axis_list[e].sign.setCurrentText(params[str(e)]['sign'])
-                    self.axis_list[e].multiSpin.setValue(float(params[str(e)]['multiplier'].replace(',','.')))
-                    self.axis_list[e].docName.setText(params[str(e)]['docName'])
-                    self.axis_list[e].obj_label.setText(params[str(e)]['obj_label'])
-                    self.axis_list[e].vector.setCurrentText(params[str(e)]['vector'])
-                    self.axis_list[e].spd_pos.setCurrentText(params[str(e)]['spd_pos'])
-                except:
-                    break
-        except:
-            pass
+        self.settings.load_axis_settings(self.axis_list)
+        
 
     def accept(self):
-        self.save()
+        self.settings.save_axis_settings(self.axis_list)
         FreeCADGui.Control.closeDialog() #close the dialog
 
     
