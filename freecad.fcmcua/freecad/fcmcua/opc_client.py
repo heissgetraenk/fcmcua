@@ -71,7 +71,7 @@ class OpcClient():
             # only connect if the active document contains a valid Assembly4 model
             if self.upd.checkModel() is None:
                 # error message
-                print("No Assembly4 container found in active document")
+                print("[Fcmcua] No Assembly4 container found in active document")
 
                 # abort communication loop
                 self.running = False
