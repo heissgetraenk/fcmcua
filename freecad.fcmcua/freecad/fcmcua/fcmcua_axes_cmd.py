@@ -73,7 +73,8 @@ class AxisPanel:
         
 
     def accept(self):
-        self.settings.save_axis_settings(self.axis_list)
+        if self.axes > 0:
+            self.settings.save_axis_settings(self.axis_list)
         FreeCADGui.Control.closeDialog() #close the dialog
 
     
