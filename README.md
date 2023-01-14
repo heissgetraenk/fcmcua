@@ -25,7 +25,7 @@ This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 Place the files from [freecad.fcmcua/freecad/fcmcua](https://github.com/heissgetraenk/fcmcua/tree/main/freecad.fcmcua/freecad/fcmcua) in your FreeCAD/Mod directory:  
 * package install: *~/.FreeCAD/Mod*
 * AppImage: *~/.local/share/FreeCAD/Mod*
-* Make sure to use this directory structure: *~/.FreeCAD/Mod/freecad.fcmcua/freecad/fcmcua*
+* Make sure to use this directory structure: *Your-FreeCAD-Dir/Mod/freecad.fcmcua/freecad/fcmcua*
 
 ## Usage:  
 
