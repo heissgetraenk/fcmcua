@@ -14,25 +14,18 @@ Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can 
 
 ## Installation:  
 
-I am new to writing FreeCAD workbenches and have not been able to figure out how to get Fcmcua installed automatically. So unfortunately installation has to be done manually at this point. Any pointers on how to automate this process are more than welcome.
+I am new to writing FreeCAD workbenches and am in the process of figuring out how to get Fcmcua installed automatically. So unfortunately installation has to be done manually at this point.
 
 ### Manual Installation:  
 
 This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 
 #### Linux:  
-
-1. When using a FreeCAD AppImage: make sure you have the same python version installed, as packaged into the AppImage
-2. Install dependencies into the correct python version: 
-    1. `pip install asyncua`
-    2. `pip install pyside2`    
-3. Place the files from [freecad.fcmcua/freecad/fcmcua](https://github.com/heissgetraenk/fcmcua/tree/main/freecad.fcmcua/freecad/fcmcua) in your FreeCAD/Mod directory:
-    * package install: *~/.FreeCAD/Mod*
-    * AppImage: *~/.local/share/FreeCAD/Mod*
-    * Make sure to use this directory structure: *~/.FreeCAD/Mod/freecad.fcmcua/freecad/fcmcua*
-4. Edit the paths in **fcmcua.ini**:
-    1. **PyPath**: Path to your python packages
-    2. **WbPath**: Path to where you placed the workbench files
+   
+Place the files from [freecad.fcmcua/freecad/fcmcua](https://github.com/heissgetraenk/fcmcua/tree/main/freecad.fcmcua/freecad/fcmcua) in your FreeCAD/Mod directory:  
+* package install: *~/.FreeCAD/Mod*
+* AppImage: *~/.local/share/FreeCAD/Mod*
+* Make sure to use this directory structure: *~/.FreeCAD/Mod/freecad.fcmcua/freecad/fcmcua*
 
 ## Usage:  
 
