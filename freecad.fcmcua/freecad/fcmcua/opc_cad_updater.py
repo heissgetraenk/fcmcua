@@ -1,6 +1,8 @@
 import FreeCAD as App
-from datetime import datetime
 import math
+
+# uncomment to calculate and display compute times
+# from datetime import datetime
 
 # round values received from FreeCAD to 3 decimals
 _RND_PARAM = 3
@@ -13,7 +15,7 @@ class CadUpdater():
         self.axis_list = axis_list
         self.actu_list = actu_list
 
-        # prepare benchmarking
+        # variables used in calculating compute times
         self.cycles = 0
         self.total_rec = self.total_upd = 0.0
 
@@ -22,12 +24,14 @@ class CadUpdater():
         '''method to interact with FreeCAD model'''
         self.axis_values = axis_values
         self.actu_values = actu_values
+        
+        # uncomment to calculate and display compute times
         # b_upd = datetime.now()
         
         # loop counter as an index for the values-list 
         itr = 0
 
-        # iterate through all axis settings entries
+        # iterate through all axis settings entries and update them
         for obj in self.axis_list:
             self._updateAxis(obj, itr, poll_rate)
             itr += 1
@@ -35,17 +39,14 @@ class CadUpdater():
         # reset loop counter
         itr = 0
         
-        # iterate through all actuator settings entries
+        # iterate through all actuator settings entries and update them
         for obj in self.actu_list:
             self._updateActuator(obj, itr)
             itr += 1
 
-        #recompute the CAD model
-        # b_rec = datetime.now()
-        # App.ActiveDocument.recompute()
         self._recompute()
         
-        # benchmarking
+        # uncomment to calculate and display compute times
         # a_rec = a_upd = datetime.now()
         # rec_cyc = (a_rec - b_rec).total_seconds()
         # upd_cyc = (a_upd - b_upd).total_seconds()
@@ -80,45 +81,56 @@ class CadUpdater():
 
 
     def _updateAxis(self, obj, itr, poll_rate):
-        # get values already in FreeCAD
+        # extract document name and LCS label
         doc = obj.docName.text()
         fc_obj = obj.obj_label.text()
+
+        # get previous values
         prev = self._getFcValues(doc, fc_obj)
 
-                       
+        #calculate and set new placement vector values
         try:    
-            #new placement vector values:
+            # get the multiplier for the given axis
             multi = self.axis_list[itr].multiSpin.value()
-            # value from opc is positional in [mm]
+
+            # is the value coming from opc a position or a spindle/speed value?
             if obj.spd_pos.currentText() == 'pos':
+                # positional value in [mm] or [deg]
                 val = multi * self.axis_values[itr]
-            # value from opc is speed in [360°/min] or [1/min]
             else:
-                # rotational speed axis/spindle
+                # spindle/speed value in [deg] or [mm]?
                 if obj.vector.currentText() == 'deg':
+                    # spindle speed:
                     # multiplier * speed [360°/s] * poll_rate [ms]
                     val = multi * (6 * self.axis_values[itr]) * (poll_rate/1000)
-                # linear/positional speed axis
                 else:
+                    # value from opc is a speed value driving a linear axis:
                     # multiplier is interpreted as gear ratio: e.g. 1 revolution = 10 mm --> multi = 10.0
                     # multi [mm] * speed [1/min] * poll_rate [ms]
                     val = multi * (self.axis_values[itr] / 60) * (poll_rate/1000)
 
+            # update the LCS Placement: 
+            # update positional axes by assigning them the received value
+            # update speed axes by incrementing them with the calculated value 
             if obj.spd_pos.currentText() == 'pos':
-                # use previous values except for assigned opc variables (marked by n.vector.currentText() = 'x/y/z/°')
-                # factor in pos/neg sign where applicable
+                # positional axis:
+                # Assign vector components with previous values except for 
+                # vectors with a corresponding opc variable (marked by obj.vector.currentText() = 'x/y/z/°').
+                # Factor in pos/neg sign where applicable.
                 x = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'x' else prev['old_X']
                 y = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'y' else prev['old_Y']
                 z = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'z' else prev['old_Z']
 
-                #n ew angle
+                #new angle
                 angle = (val if obj.sign.currentText() == '+' else (-val)) if obj.vector.currentText() == 'deg' else prev['old_angle']
 
                 # update the axis values in the freecad document
                 App.getDocument(doc).getObjectsByLabel(fc_obj)[0].AttachmentOffset = App.Placement(App.Vector(x,y,z),App.Rotation(App.Vector(prev['rot_x'], prev['rot_y'], prev['rot_z']), angle))
             else:
-                # use previous values except for assigned opc variables (marked by n.vector.currentText() = 'x/y/z/°')
-                # increment those by the new value. factor in pos/neg sign where applicable
+                # speed axis:
+                # Assign vector components with previous values except for 
+                # vectors with a corresponding opc variable (marked by obj.vector.currentText() = 'x/y/z/°').
+                # Increment those by the new value and factor in pos/neg sign where applicable.
                 x = (prev['old_X'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'x' else prev['old_X']
                 y = (prev['old_Y'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'y' else prev['old_Y']
                 z = (prev['old_Z'] + (val if obj.sign.currentText() == '+' else (-val))) if obj.vector.currentText() == 'z' else prev['old_Z']
@@ -134,15 +146,19 @@ class CadUpdater():
 
    
     def _updateActuator(self, obj, itr):
-        # get values already in FreeCAD
+        # extract document name and LCS label
         doc = obj.docLEdit.text()
         fc_obj = obj.objLEdit.text()
+
+        # get previous values
         prev = self._getFcValues(doc, fc_obj)
                 
         try:    
-            #use previous values except for assigned opc variables (marked by n.vector.currentText() = 'x/y/z')
-            #new placement vector values:
+            #new placement vector value:
             val = self.actu_values[itr]
+
+            # Assign vector components with previous values except for 
+            # vectors with a corresponding opc variable (marked by obj.vector.currentText() = 'x/y/z/°').
             x = val if obj.vectorCombo.currentText() == 'x' else prev['old_X']
             y = val if obj.vectorCombo.currentText() == 'y' else prev['old_Y']
             z = val if obj.vectorCombo.currentText() == 'z' else prev['old_Z']
@@ -172,7 +188,6 @@ class CadUpdater():
 
         #
         # This method is borrowed straight from Zolko's Asm4 workbench v0.12 (Asm4_libs.py).
-        # Thanks Zolko!
         #
 
         retval = None

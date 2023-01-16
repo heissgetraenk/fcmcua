@@ -135,7 +135,6 @@ class Settings:
             except Exception as e:
                 print("[Fcmcua] Error while loading from file:", e)
 
-
             for e in range(len(actu_list)):
                 try:
                     actu_list[e].typeCombo.setCurrentText(params[str(e)]['type'])
@@ -147,10 +146,9 @@ class Settings:
                     actu_list[e].objLEdit.setText(params[str(e)]['objLabel'])
                     actu_list[e].vectorCombo.setCurrentText(params[str(e)]['vector'])
                     actu_list[e].openSpin.setValue(float(params[str(e)]['openPos'].replace(',', '.' )))
-                    actu_list[e].blockSpin.setValue(float(params[str(e)]['blockPos'].replace(',', '.' )))
                     actu_list[e].closeSpin.setValue(float(params[str(e)]['closePos'].replace(',', '.' )))
+                    actu_list[e].blockSpin.setValue(float(params[str(e)]['blockPos'].replace(',', '.' )))
                     actu_list[e].openTSpin.setValue(float(params[str(e)]['openTime'].replace(',', '.' )))
                     actu_list[e].closeTSpin.setValue(float(params[str(e)]['closeTime'].replace(',', '.' )))
                 except Exception as e:
                     print("[Fcmcua] Error while applying loaded settings:", e)
-            

@@ -1,9 +1,10 @@
 from asyncua.sync import Client
 from opc_cad_updater import CadUpdater
-import time
 import FreeCADGui as Gui
 from datetime import datetime
 from fcmcua_actuator_logic import ActuatorLogic
+
+import time
 
 class OpcClient():
     def __init__(self, axis_list, actu_list ):
@@ -30,10 +31,9 @@ class OpcClient():
         # loop control variable
         self.running = True
 
+        # open the connection
         try:
             client.connect()
-
-            # root = client.get_root_node()
 
             #variables on the opc server:
             self.axes = []
@@ -41,18 +41,23 @@ class OpcClient():
 
             # gather axis variables
             for n in range(len(self.axis_list)):
-                # node = self.set_list[n].nodeID.text()
                 self.axes.append(client.get_node(self.axis_list[n].nodeID.text()))
 
             # gather actuator variables in sets of three [open, close, block]
             for a in range(len(self.actu_list)):
                 # depending on type, get one or two variables
                 type = int(self.actu_list[a].typeCombo.currentText()[:1])
+
+                # if type 1 or 2: get open node
                 open = client.get_node(self.actu_list[a].openLEdit.text() if (type == 1 or type == 2) else False)
+                
+                # if type 1 or 3: get close node
                 close = client.get_node(self.actu_list[a].closeLEdit.text() if (type == 1 or type == 3) else False)
+                
                 # if the conditional block option is set, get also the node for that
                 block = client.get_node(self.actu_list[a].blockLEdit.text()) if (self.actu_list[a].blockCheck.isChecked()) else False
-                # per actuator, collect all nodes to be gotten from the opc server and place them in a list-entry
+                
+                # collect all nodes to be gotten from the opc server and place them in the list-entry for that actuator
                 self.actuators.append([open, close, block])
             
             # initialize lists for the axis values coming from the opc server
@@ -81,7 +86,6 @@ class OpcClient():
                 return
 
             # initialize one actuator logic object per set of actuator configurations in actu_list
-            # pass reference to the trigger variable-sets and to each actuator's parameters
             for o in range(len(self.actu_list)):
                 # gather all actuator logic objects in a list
                 self.actu_objs.append(ActuatorLogic(self.actu_list[o], self.poll_rate))
@@ -89,19 +93,20 @@ class OpcClient():
             raise e
 
 
-        # prepare benchmarking
+        # prepare variables for calculating the compute times
         total_time = 0.0
         cycles = 0
         self.do_upd = False
+
+        # wait while the server does nothing
         while not self.do_upd:
+            # check if a value in the opc server changed
             self._poll_opc()
 
         # main loop
         while self.running:
+            # time before this cycle
             before = datetime.now()
-
-            # measure how long the cycle takes before sleeping
-            t_start = datetime.now()
             
             self.do_upd = False
 
@@ -114,15 +119,19 @@ class OpcClient():
             # update the Gui to prevent freeze
             Gui.updateGui()
     
+            # time at the end of the update cycle
+            t_end = datetime.now()
+
             # wait for poll_rate (ms) --> calculate seconds by 1/1000.0
             # dont sleep longer than the poll rate, if the opc interaction takes a significant amount of time
-            t_end = datetime.now()
-            sleep = (self.poll_rate/1000) - (t_end - t_start).total_seconds()
+            sleep = (self.poll_rate/1000) - (t_end - before).total_seconds()
             if sleep > 0: 
                 time.sleep(sleep)
 
-            # benchmarking
+            # time after this cycle (including time slept)
             after = datetime.now()
+
+            # calculate the compute time if an update was performed
             time_elapsed = (after - before).total_seconds()
 
             if self.do_upd:
@@ -131,7 +140,6 @@ class OpcClient():
                 if cycles > 0:
                     avg = total_time / cycles
                     compT_widget.setText(f"Compute time: {round(avg*1000, 1)} ms")
-                    # print("Average Opc Cycle time [s]: ", avg)
            
         # after connection was stopped
         client.disconnect()
@@ -143,26 +151,10 @@ class OpcClient():
     
     def _poll_opc(self):
         # get axis values from server
-        # for v in self.axes:
-        #     try:
-        #         self.axis_values[self.axes.index(v)] = v.get_value()
-        #     except:
-        #         pass
         self.axis_values = list(map(self._get_value, self.axes))
 
         # get actuator trigger values from server
-        # for set in self.actuators:
-        #     for id in set:
-        #         try:
-        #             self.actu_triggers[self.actuators.index(set)][set.index(id)] = id.get_value()
-        #         except:
-        #             # not a valid opc node
-        #             pass
         self.actu_triggers = list(map(self._get_act_values, self.actuators))
-        # print(self.actu_triggers)
-        # print(len(self.actu_list))
-        # print(len(self.actu_values))
-
 
         # get actuator target values as calculated by the actuator logic objects
         for a in range(len(self.actu_list)):
@@ -178,9 +170,7 @@ class OpcClient():
                 self.do_upd = True
                 break
 
-
         # update and recompute the FreeCAD document if an actuator value changed
-        # but only if updateCAD has not yet been called in this loop-cycle
         if not self.do_upd:
             for m in range(len(self.actu_list)):
                 if self.actu_values[m] != self.prev_actu_values[m]:
@@ -200,10 +190,12 @@ class OpcClient():
             return node.get_value()
         except:
             # not a valid node id
+            # but that's ok, keep going with return value 'False'
             return False
 
 
     def _get_act_values(self, set):
+        # helper method for getting actuator values
         return list(map(self._get_value, set))
 
     

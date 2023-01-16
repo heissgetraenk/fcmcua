@@ -2,7 +2,6 @@ from PySide2 import QtCore, QtWidgets
 import FreeCAD
 import FreeCADGui
 import os
-import json
 
 from opc_client import OpcClient
 from axis_widgets import AxisWidgets
@@ -85,10 +84,11 @@ class FcmcuaPanel:
         self.disconnBtn.clicked.connect(self.onDisconnClicked)
 
         for i in range(self.axes):
-            # create setting widget and gather them in a list
+            # create axis widgets and gather them in a list
             self.axis_list.append(AxisWidgets(i)) 
 
         for j in range(self.actuators):
+            # create actuator widgets and gather them in a list
             self.actu_list.append(ActuatorWidgets(hidden=True))
 
         # initialize opc client object
@@ -100,6 +100,7 @@ class FcmcuaPanel:
     
     def onConnClicked(self):
         try:
+            # set connection state to "connected" and start the connection
             self.stateLabel.setText("Server: Connected")
             self.opc.start(self.addrLEdit.text(), self.pollSpin.value(), self.compTimeLabel)
         except Exception as e:
@@ -111,6 +112,7 @@ class FcmcuaPanel:
 
     def onDisconnClicked(self):
         try:
+            # set connection stated to "Disconnected" and stop the connection
             self.stateLabel.setText("Server: Disconnected")
             self.compTimeLabel.setText("Compute time: -- ms")
             self.opc.stop()
@@ -146,7 +148,7 @@ class _LinkToOpcUa:
             'Connection settings dialog')
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             'FCMC_LinkToOpcUa',
-            'Set the server address connect to the OPC UA Server')
+            'Set the server address and connect to the OPC UA Server')
         return {
             'Pixmap': os.path.join(ICONPATH, "fcmcua_wb.svg"),
             'MenuText': MenuText,

@@ -87,8 +87,6 @@ If you have thoughts on how to optimize the recompute performance, please let me
 
 This workbench is very much a work in progress. Any advice is welcome, as are contributions to the code. The following points could be improved upon in the future:  
 
-* comments and code clean up (I'll get to it someday, I swear!)
-* automate the installation process  
 * change the number of axis/actuators from the Gui  
 * accept Node Ids in the form of *ns=2;VariableName*  
 * implement a switch metric/imperial or read it from the FreeCAD preferences    
@@ -102,3 +100,4 @@ If you find a bug or have a feature you think would be cool to have in this work
 * [Assembly4](https://github.com/Zolko-123/FreeCAD_Assembly4) Workbench by [Zolko-123](https://github.com/Zolko-123)
 * Tutorial on [FreeCAD Workbenches](https://github.com/felipe-m/tutorial_freecad_wb) by [Felipe Machado](https://github.com/felipe-m)
 * Workbench [Starterkit](https://github.com/looooo/Workbench-Starterkit) by [lorenz](https://github.com/looooo)
+* Free OPC UA [Library](https://github.com/FreeOpcUa/opcua-asyncio)
