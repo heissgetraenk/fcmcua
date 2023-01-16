@@ -1,4 +1,4 @@
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtWidgets
 
 __pos_max__ = 10000
 __pos_min__ = -10000
@@ -13,7 +13,8 @@ class ActuatorWidgets(QtWidgets.QWidget):
     def __init__(self, hidden=False):
         self.widgets = []
 
-        #widget mode
+        # widget mode: utilize show/hide mechanism only when the Gui widgets are being displayed
+        # i.e. on the Actuators_Cmd panel
         self.hidden = hidden
 
         # type
@@ -71,17 +72,7 @@ class ActuatorWidgets(QtWidgets.QWidget):
         self.openSpin.setValue(100)
         self.openSpin.setSuffix(__pos_unit__)
         self.widgets.append(self.openSpin)
-        self.openSpin.textChanged[str].connect(self._onOpenPosChanged)
-
-        self.blockSLabel = QtWidgets.QLabel('Block postion')
-        self.widgets.append(self.blockSLabel)
-
-        self.blockSpin = QtWidgets.QDoubleSpinBox()
-        self.blockSpin.setRange(__pos_min__, __pos_max__)
-        self.blockSpin.setValue(50)
-        self.blockSpin.setSuffix(__pos_unit__)
-        self.widgets.append(self.blockSpin)
-        self.blockSpin.textChanged[str].connect(self._onBlockPosChanged)
+        self.openSpin.textChanged.connect(self._onNodePosChanged)
 
         self.closeSLabel = QtWidgets.QLabel('Close postion')
         self.widgets.append(self.closeSLabel)
@@ -91,7 +82,16 @@ class ActuatorWidgets(QtWidgets.QWidget):
         self.closeSpin.setValue(0)
         self.closeSpin.setSuffix(__pos_unit__)
         self.widgets.append(self.closeSpin)
-        self.closeSpin.textChanged[str].connect(self._onClosePosChanged)
+        self.closeSpin.textChanged.connect(self._onNodePosChanged)
+
+        self.blockSLabel = QtWidgets.QLabel('Block postion')
+        self.widgets.append(self.blockSLabel)
+
+        self.blockSpin = QtWidgets.QDoubleSpinBox()
+        self.blockSpin.setRange(__pos_min__, __pos_max__)
+        self.blockSpin.setValue(50)
+        self.blockSpin.setSuffix(__pos_unit__)
+        self.widgets.append(self.blockSpin)
 
         # duration spin boxes (open & close)
         self.openTLabel = QtWidgets.QLabel('Opening duration')
@@ -115,27 +115,13 @@ class ActuatorWidgets(QtWidgets.QWidget):
         # call _onBlockChecked once
         self._onBlockChecked()
 
-    def _onClosePosChanged(self, value):
-        '''
-        closing position must be < opening position
-        '''
-        self.openSpin.setMinimum(float(value[:-3].replace(',', '.' )))
-        self.blockSpin.setMinimum(float(value[:-3].replace(',', '.' )))
 
-    def _onOpenPosChanged(self, value):
-        '''
-        closing position must be < opening position
-        '''
-        self.closeSpin.setMaximum(float(value[:-3].replace(',', '.' )))
-        self.blockSpin.setMaximum(float(value[:-3].replace(',', '.' )))
-
-
-    def _onBlockPosChanged(self, value):
+    def _onNodePosChanged(self):
         '''
         blocking position must between opening and closing position
         '''
-        self.closeSpin.setMaximum(float(value[:-3].replace(',', '.' )))
-        self.openSpin.setMinimum(float(value[:-3].replace(',', '.' )))
+        self.blockSpin.setMinimum(min(self.closeSpin.value(), self.openSpin.value()))
+        self.blockSpin.setMaximum(max(self.closeSpin.value(), self.openSpin.value()))
 
     
     def _onTypeChanged(self):
@@ -163,8 +149,10 @@ class ActuatorWidgets(QtWidgets.QWidget):
     
 
     def _onBlockChecked(self):
+        '''
+        hide block node id and block position widgets if block option is unchecked
+        '''
         if not self.hidden:
-            # print("option checkbox is checked:", self.blockCheck.isChecked())
             if self.blockCheck.isChecked():
                 self.blockLabel.show()
                 self.blockSLabel.show()

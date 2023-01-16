@@ -2,7 +2,6 @@ from PySide2 import QtCore, QtWidgets
 import FreeCAD
 import FreeCADGui
 import os
-import json
 
 from actuator_widgets import ActuatorWidgets
 from fcmcua_settings import Settings
@@ -40,6 +39,7 @@ class ActuatorPanel:
                 #create a group box per actuator
                 groups.append(QtWidgets.QGroupBox('Actuator' + str(i+1)))
 
+                # begin placing widgets in the layout at row 0
                 start_row = 0
 
                 # add child-widgets to layout
@@ -77,7 +77,8 @@ class ActuatorPanel:
             self.settings.load_actuator_settings(self.actu_list)
 
         else:
-            defaultLabel = QtWidgets.QLabel('No actuator available')
+            # no actuator configured
+            defaultLabel = QtWidgets.QLabel('No actuator configured in fcmcua.ini')
             main_layout.addWidget(defaultLabel)
 
 

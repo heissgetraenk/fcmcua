@@ -11,13 +11,10 @@ class AxisWidgets(QtWidgets.QWidget):
     def __init__(self, id):
         self.id= id
         self.widgets=[]
+        
         #node LineEdit
         self.nodeID = QtWidgets.QLineEdit("ns=2;i=2")
         self.widgets.append(self.nodeID)
-
-        #opc variable LineEdit
-        # self.var = QtWidgets.QLineEdit("Variable " + str(self.id))
-        # self.widgets.append(self.var)
 
         # equals Label
         self.equals = QtWidgets.QLabel("=")

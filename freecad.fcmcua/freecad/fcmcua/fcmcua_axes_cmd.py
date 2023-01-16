@@ -2,7 +2,6 @@ from PySide2 import QtCore, QtWidgets
 import FreeCAD
 import FreeCADGui
 import os
-import json
 
 from axis_widgets import AxisWidgets
 from fcmcua_settings import Settings
@@ -56,17 +55,22 @@ class AxisPanel:
         layout.addWidget(self.typeLabel,0,10,1,1)
 
         # ---- row 1..n: settings widgets
-        for i in range(self.axes):
-            # create setting widget and gather them in a list
-            self.axis_list.append(AxisWidgets(i)) 
-            # starting column index
-            col = 0 
-            # list of column widths 
-            col_spans = [2,1,1,1,2,2,1,1] 
-            # add widgets to layout with their respective column width, increment the column index accordingly
-            for w in range(len(self.axis_list[0].widgets)):
-                layout.addWidget(self.axis_list[i].widgets[w],1+i,col,1,col_spans[w])
-                col += col_spans[w]
+        if self.axes > 0:
+            for i in range(self.axes):
+                # create setting widget and gather them in a list
+                self.axis_list.append(AxisWidgets(i)) 
+                # starting column index
+                col = 0 
+                # list of column widths 
+                col_spans = [2,1,1,1,2,2,1,1] 
+                # add widgets to layout with their respective column width, increment the column index accordingly
+                for w in range(len(self.axis_list[0].widgets)):
+                    layout.addWidget(self.axis_list[i].widgets[w],1+i,col,1,col_spans[w])
+                    col += col_spans[w]
+        else:
+            # no axis configured
+            defaultLabel = QtWidgets.QLabel('No axis configured in fcmcua.ini')
+            layout.addWidget(defaultLabel)
 
         #load previous settings from file params.fcmc
         self.settings.load_axis_settings(self.axis_list)
