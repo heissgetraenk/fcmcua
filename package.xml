@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
-  <name>Motion Control Workbench</name> <!-- What the Addon Manager displays to users -->
+  <name>FCMCUA Motion Control Workbench</name> <!-- What the Addon Manager displays to users -->
   <description>Link a motion controller to a FreeCAD assembly using OPC UA</description>
   <version>1.0.0</version> <!-- Semantic versioning (1.2.3-beta) or CalVer-based, (2022.01.07), don't omit or non-git installations won't see your updates -->
-  <date>2023-01-15</date> <!-- Date of the last update to the version number -->
-  <maintainer email="your_address@null.com">heissgetraenk</maintainer>
+  <date>2023-01-16</date> <!-- Date of the last update to the version number -->
+  <maintainer email="heissgetraenk@gmx.de">heissgetraenk</maintainer>
   <license file="LICENSE">GPL-3</license> <!-- Make sure you actually have this file in your Addon repo if the license requires it -->
   <url type="repository" branch="main">https://github.com/heissgetraenk/fcmcua</url> <!-- Don't forget to update the branch name here -->
   <url type="readme">https://github.com/heissgetraenk/fcmcua/blob/main/README.md</url> <!-- Link to the HTML-rendered README page -->
@@ -12,8 +12,10 @@
 
   <content>
     <workbench>
-      <classname>MyLegacyWorkbench</classname> <!-- Must match class name in InitGui.py -->
+      <classname>Fcmcua</classname> <!-- Must match class name in InitGui.py -->
       <subdirectory>./</subdirectory>
+      <!-- Python package dependencies-->
+      <depend>asyncua</depend>
     </workbench>
   </content>
 
