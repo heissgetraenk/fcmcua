@@ -1,7 +1,7 @@
 # FreeCAD Motion Control Workbench FCMCUA
 Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can be used to manipulate assemblies created by the [Assembly4](https://github.com/Zolko-123/FreeCAD_Assembly4) workbench. It does so by updating the Attachment Offsets of the assembly's Local Coordinate Systems to match the target position values provided by the OPC UA server.
 
-## Use cases:
+## Use cases
 
 - **Virtual Commissioning**  
   Visualize PLC motion control code on a mock-up of your target machine before testing it on the real hardware. This is especially useful if you want to program the PLC before the physical machine is fully built or even fully designed.
@@ -12,11 +12,11 @@ Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can 
 
 ![fcmcua_demo](https://user-images.githubusercontent.com/104628764/211853683-031cf2f3-6bcc-41fa-9d38-f4cbf12fcaa7.gif)  
 
-## Installation:  
+## Installation  
 
 This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 
-### Addon Manager:  
+### Addon Manager  
 
 Fcmcua is available from the integrated [Addon Manager](https://wiki.freecadweb.org/Std_AddonMgr).
 * Go to <code>Tools > Addon manager</code>
@@ -25,7 +25,7 @@ Fcmcua is available from the integrated [Addon Manager](https://wiki.freecadweb.
 * Make sure to also install the dependency <code>asyncua</code>
 * Restart FreeCAD
 
-## Usage:  
+## Usage  
 
 **Some basics:** Fcmcua works by updating the AttachmentOffsets of the Local Coordinate Systems (LCS) with which the individual parts are attached to one another. Take a look at the command that does this:  
 
@@ -38,7 +38,7 @@ As you can see, the FreeCAD part that contains the LCS is given a Placement obje
 
 Note also, that the Placement object given to the LCS contains a position and a rotation. The Fcmcua workbench gets values from an OPC UA node and plugs them into the x, y, z or angle of the Placement object. For Fcmcua to know where each value goes, you need to configure each Node - Placement pairing.  
 
-### Configuring Axis Settings:  
+### Configuring Axis Settings  
 
 To set the number of axis nodes you want to configure, edit the **fcmcua.ini** file in the Fcmcua install directory.
 
@@ -52,7 +52,7 @@ To set the number of axis nodes you want to configure, edit the **fcmcua.ini** f
 * **Offset:**         The part of the AttachmentOffset that the value from the OPC node will be plugged into. The selected x, y, z or angle correspond to the the vector components in the App.Placement command shown above.  
 * **Type:**           What kind of value does the OPC node represent: An axis **pos**ition or a motor **speed**?  
 
-### Configuring Actuator Settings:  
+### Configuring Actuator Settings  
 
 Think of actuators as anything that performs a motion and is started/stopped by binary signals. To set the number of actuator nodes you want to configure, edit the **fcmcua.ini** file in the Fcmcua install directory.
 
