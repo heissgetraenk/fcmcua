@@ -14,18 +14,16 @@ Link a motion controller to a FreeCAD assembly using OPC UA. This workbench can 
 
 ## Installation:  
 
-I am new to writing FreeCAD workbenches and am in the process of figuring out how to get Fcmcua installed automatically. So unfortunately installation has to be done manually at this point.
-
-### Manual Installation:  
-
 This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 
-#### Linux:  
-   
-Place the files from [freecad.fcmcua/freecad/fcmcua](https://github.com/heissgetraenk/fcmcua/tree/main/freecad.fcmcua/freecad/fcmcua) in your FreeCAD/Mod directory:  
-* package install: *~/.FreeCAD/Mod*
-* AppImage: *~/.local/share/FreeCAD/Mod*
-* Make sure to use this directory structure: *Your-FreeCAD-Dir/Mod/freecad.fcmcua/freecad/fcmcua*
+### Addon Manager:  
+
+Fcmcua is available from the integrated [Addon Manager](https://wiki.freecadweb.org/Std_AddonMgr).
+* Go to <code>Tools > Addon manager</code>
+* Finde <code>Fcmcua Motion Control Workbench</code> in the list
+* Install the workbench
+* make sure to also install the dependency <code>asyncua</code>
+* restart FreeCAD
 
 ## Usage:  
 
@@ -46,7 +44,7 @@ To set the number of axis nodes you want to configure, edit the **fcmcua.ini** f
 
  ![axis_settings](https://user-images.githubusercontent.com/104628764/212299899-c6022ade-881f-4acd-a94e-dfa800b48d07.png)
 
-* **Node Id:**        Node Id on the OPC UA server. Fcmcua expects a string that looks like this: *ns=2;i=2*  
+* **Node Id:**        Node Id on the OPC UA server. Fcmcua expects a string that looks like this: <code>ns=2;i=2</code> or <code>ns=2;s="DB_Name"."VarName"</code>  
 * **Sign:**           The value coming from the OPC node might be oriented opposite to the direction in which you assembled the model. Invert the value by selecting +/-.  
 * **Factor:**         This gets multiplied with the value comming from the node. If for example you control a motor by outputting a speed or rotor-position, you might not have a variable in your controller that represents the actual position of that axis. In that case you might want to factor in a gear ratio to derive the position from the value that you do have in the controller.  
 * **Document Name:**  The name of the file containing the Local Coordinate System.  
