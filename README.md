@@ -20,10 +20,10 @@ This workbench was tested on FreeCAD v0.20.1 and with Python 3.10.5.
 
 Fcmcua is available from the integrated [Addon Manager](https://wiki.freecadweb.org/Std_AddonMgr).
 * Go to <code>Tools > Addon manager</code>
-* Finde <code>Fcmcua Motion Control Workbench</code> in the list
+* Find <code>Fcmcua Motion Control Workbench</code> in the list
 * Install the workbench
-* make sure to also install the dependency <code>asyncua</code>
-* restart FreeCAD
+* Make sure to also install the dependency <code>asyncua</code>
+* Restart FreeCAD
 
 ## Usage:  
 
