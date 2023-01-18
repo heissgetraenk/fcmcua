@@ -8,7 +8,7 @@
   <license file="LICENSE">GPL-3</license>
   <url type="repository" branch="main">https://github.com/heissgetraenk/fcmcua</url>
   <url type="readme">https://github.com/heissgetraenk/fcmcua/blob/main/README.md</url>
-  <icon>freecad.fcmcua/freecad/fcmcua/resources/fcmcua_wb.svg</icon>
+  <icon>freecad/fcmcua/resources/fcmcua_wb.svg</icon>
 
   <content>
     <workbench>
