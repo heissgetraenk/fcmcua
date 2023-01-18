@@ -102,6 +102,7 @@ class OpcClient():
         while not self.do_upd:
             # check if a value in the opc server changed
             self._poll_opc()
+            Gui.updateGui()
 
         # main loop
         while self.running:
