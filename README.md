@@ -22,7 +22,6 @@ Fcmcua is available from the integrated [Addon Manager](https://wiki.freecadweb.
 * Go to <code>Tools > Addon manager</code>
 * Find <code>Fcmcua Motion Control Workbench</code> in the list
 * Install the workbench
-* Make sure to also install the dependency <code>asyncua</code>
 * Restart FreeCAD
 
 ## Usage  
