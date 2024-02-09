@@ -5,7 +5,7 @@
   <version>1.0.0</version>
   <date>2023-01-16</date>
   <maintainer email="heissgetraenk@gmx.de">heissgetraenk</maintainer>
-  <license file="LICENSE">GPL-3</license>
+  <license file="LICENSE">GPL-3.0-or-later</license>
   <url type="repository" branch="main">https://github.com/heissgetraenk/fcmcua</url>
   <url type="readme">https://github.com/heissgetraenk/fcmcua/blob/main/README.md</url>
   <icon>freecad/fcmcua/resources/fcmcua_wb.svg</icon>
